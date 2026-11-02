@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>下载中心</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+    color: #e7e7ef;
+    background-color: #0f0f16;
+    background-image: url("/pictures/starlight-idol-celebration-2160.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 9, 14, calc(var(--glass-alpha) * 0.64));
+    pointer-events: none;
+  }
+  /* 全站液态玻璃统一变量（设置面板滑块实时驱动） */
+  :root {
+    --glass-alpha: 1; /* 亮度：玻璃底色浓淡乘数 0.25~1，作用与历史版本一致 */
+    --glass-opacity: 1; /* 不透明度：0~1。0 时玻璃背景/模糊/边框完全透明可透过后方图片，1 时与默认一致 */
+  }
+  /* 顶部跳转栏 */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    height: 58px;
+    padding: 0 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.62)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.16)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    position: relative;
+    z-index: 10;
+  }
+  .nav a {
+    font-family: SimSun, "宋体", "Songti SC", serif;
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav a:hover { text-decoration: underline; }
+  .nav a.home {
+    font-size: 22px;
+    color: #1a6dff;
+  }
+  .nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav .nav-setting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.34)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.14)));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    cursor: pointer;
+  }
+  .nav .nav-setting img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .nav .nav-setting:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.24)));
+  }
+  .music-widget .nav-music {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 12px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.5)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .nav-music .nm-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2bd6ff, #ff5fa8);
+  }
+  .music-widget .nav-music img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .nav-music:hover {
+    transform: scale(1.06);
+  }
+  .glass-pop {
+    position: absolute;
+    top: 66px;
+    right: 16px;
+    width: 320px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.78)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.46)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.24)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 999;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+  }
+  .glass-pop[hidden] { display: none; }
+  /* 音乐播放器独立浮动组件：默认固定于页面左下角，可鼠标拖动（刷新回默认位） */
+  .music-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.80)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.22)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 998;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+  }
+  .music-widget .mw-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .music-widget .mw-playbtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 8px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.45)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .mw-playbtn[hidden] { display: none; }
+  .music-widget .mw-playbtn img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .mw-playbtn:hover {
+    transform: scale(1.08);
+  }
+  .music-widget .mw-now {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.8);
+    min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* 播放旋转：内芯持续旋转，播放时 running / 暂停时 paused（保持角度，平滑过渡） */
+  @keyframes mw-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .music-widget .nav-music .nm-inner {
+    animation: mw-spin 2.4s linear infinite;
+    animation-play-state: paused;
+  }
+  .music-widget .nav-music.mw-playing .nm-inner {
+    animation-play-state: running;
+  }
+  .mw-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mw-time {
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.75);
+    min-width: 34px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  #musicSeek {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff5fa8, #2bd6ff);
+    outline: none;
+    cursor: pointer;
+  }
+  #musicSeek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
+  }
+  #musicSeek::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    cursor: pointer;
+  }
+  .mw-list {
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .music-widget .mw-list[hidden] { display: none; }
+  .mw-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.6);
+  }
+  .gp-head {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .gp-row {
+    margin-bottom: 12px;
+  }
+  .gp-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .gp-row input[type="range"] {
+    width: 100%;
+    accent-color: #1a6dff;
+    vertical-align: middle;
+  }
+  .gp-val {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 40px;
+  }
+  .gp-bglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .bg-opt {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    color: #ffffff;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-opt:hover {
+    background: linear-gradient(135deg, rgba(138, 92, 255, 0.9), rgba(138, 92, 255, 0.4));
+  }
+  .bg-opt.active {
+    border-color: rgba(255, 255, 255, calc(var(--glass-alpha) * 0.95));
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.5));
+    box-shadow: 0 0 14px rgba(138, 92, 255, calc(var(--glass-alpha) * 0.7)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+  }
+  .gp-empty {
+    font-size: 13px;
+    color: rgba(17, 17, 17, 0.7);
+    padding: 4px 2px;
+  }
+  .gp-note {
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.65);
+  }
+  /* 全站自定义光标：m-1 默认箭头（text 目录本地资源，零外链） */
+  body {
+    cursor: url('/text/m-1.png') 0 0, auto;
+  }
+  /* m-2 手型：所有可点击元素（含各页面 .dl-btn/.plot-btn/.seg-btn/tr.row/棋盘等） */
+  a, button, .bg-opt, .nav-setting, .dl-btn, .plot-btn, .seg-btn, tr.row,
+  .board-area canvas, [role="button"], [onclick], select, summary, label,
+  input[type="submit"], input[type="radio"], input[type="checkbox"], input[type="file"] {
+    cursor: url('/text/m-2.png') 0 0, pointer !important;
+  }
+  /* 全站液态玻璃滚动条：轨道玻璃半透明、滑块粉色 100% -> 30% 渐变、圆角+内高光，hover 加深 */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.12)));
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 1), rgba(255, 105, 180, 0.3));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 0.95), rgba(255, 105, 180, 0.5));
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+
+  .wrap {
+    position: relative;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 46px 24px 72px;
+  }
+  .panel {
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.16)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.05)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(165%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(165%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.2));
+    border-radius: 16px;
+    padding: 26px 26px 20px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.4)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.25)), inset 0 -1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.08));
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #f2f2f7;
+  }
+  .crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    min-height: 22px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #9a9aac;
+  }
+  .crumb a { color: #8fb3ff; text-decoration: none; }
+  .crumb a:hover { color: #b9ceff; text-decoration: underline; }
+  .crumb .sep { color: #5b5b70; }
+  .crumb .cur { color: #e7e7ef; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 14px;
+  }
+  .col-size { width: 132px; }
+  .col-time { width: 168px; }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: #b9b9c9;
+    background: rgba(255, 255, 255, calc(var(--glass-alpha) * 0.05));
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.09));
+  }
+  td {
+    padding: 11px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.06));
+    color: #d7d7e2;
+  }
+  tr.row { cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease; }
+  tr.row:hover { background-color: rgba(124, 150, 255, calc(var(--glass-alpha) * 0.16)); }
+  tr.row:hover td, tr.row:hover td a { color: #ffffff; }
+  tr.row:hover td.size, tr.row:hover td.time { color: #d9dcff; }
+  td.name { overflow: hidden; }
+  td.name a {
+    display: block;
+    color: #d7d7e2;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  td.name a:hover { color: #ffffff; }
+  .ico { display: inline-block; width: 22px; margin-right: 6px; }
+  td.size, td.time {
+    color: #9a9aac;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  td.empty {
+    padding: 44px 0;
+    text-align: center;
+    color: #8b8b9e;
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <a class="home" href="/">主页</a>
+    <a href="/download">下载中心</a>
+    <a href="/games.html">小游戏中心</a>
+    <div class="nav-actions">
+      <button type="button" class="nav-setting" id="navSettingBtn" title="设置">
+        <img src="/text/setting.png" alt="设置">
+      </button>
+    </div>
+  </nav>
+  <div class="music-widget" id="musicWidget" title="可拖动，刷新回到默认位置">
+    <div class="mw-head">
+      <button type="button" class="nav-music" id="navMusicBtn" title="展开/收起曲目列表" aria-label="音乐播放器">
+        <span class="nm-inner"><img src="/text/music.png" alt="音乐"></span>
+      </button>
+      <div class="mw-now" id="musicNow">未播放</div>
+      <button type="button" class="mw-playbtn" id="musicPlayBtn" title="播放/暂停" aria-label="播放/暂停" hidden>
+        <img id="musicPlayImg" src="/text/play.png" alt="播放/暂停">
+      </button>
+    </div>
+    <div class="mw-progress">
+      <span class="mw-time" id="musicCur">0:00</span>
+      <input type="range" id="musicSeek" min="0" max="1000" value="0" step="1" aria-label="播放进度">
+      <span class="mw-time" id="musicDur">0:00</span>
+    </div>
+    <div class="gp-bglist mw-list" id="musicList" hidden>
+      <button type="button" class="bg-opt music-opt" data-mp3="/music/Shape%20of%20You.mp3">Shape of You.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E6%88%91%E6%9C%AC%E5%B0%86%E5%BF%83%E5%90%91%E6%98%8E%E6%9C%88.mp3">我本将心向明月.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%80%81%E7%94%B7%E5%AD%A9.mp3">老男孩.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%99%9E%E5%85%AE%E5%8F%B9.mp3">虞兮叹.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%9B%A8%E7%88%B1.mp3">雨爱.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%B8%B3%E9%B8%AF%E6%88%8F.mp3">鸳鸯戏.mp3</button>
+    </div>
+    <div class="mw-note">点击曲目播放，再次点击同一曲目暂停/继续；拖动进度条可跳转</div>
+  </div>
+  <div class="glass-pop" id="glassPop" hidden>
+    <div class="gp-head">站点设置</div>
+    <div class="gp-row">
+      <span class="gp-label">亮度</span>
+      <input type="range" id="glassAlpha" min="25" max="100" value="100" step="1">
+      <span class="gp-val" id="glassAlphaVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">不透明度</span>
+      <input type="range" id="glassOpacity" min="0" max="100" value="100" step="1">
+      <span class="gp-val" id="glassOpacityVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">背景图片（C:\Thome\Pictures）</span>
+      <div class="gp-bglist" id="bgList">
+        <button type="button" class="bg-opt" data-bg="/pictures/fragmented-pink-haired-pilot-2160.png">fragmented-pink-haired-pilot-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/holiday-morning-glow-2160.png">holiday-morning-glow-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-grid-descent-2160.png">neon-grid-descent-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-tower-runner-2160.png">neon-tower-runner-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pastel-dessert-table-2160.png">pastel-dessert-table-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pink-haired-girl-and-plushies-2160.jpg">pink-haired-girl-and-plushies-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-idol-celebration-2160.jpg">starlight-idol-celebration-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-reverie-2160.jpg">starlight-reverie-2160.jpg</button>
+      </div>
+    </div>
+    <div class="gp-note">改动实时生效，自动保存在本机浏览器</div>
+  </div>
+  <script>
+  (function () {
+    var pop = document.getElementById('glassPop');
+    var btn = document.getElementById('navSettingBtn');
+    var alpha = document.getElementById('glassAlpha');
+    var alphaVal = document.getElementById('glassAlphaVal');
+    var opacity = document.getElementById('glassOpacity');
+    var opacityVal = document.getElementById('glassOpacityVal');
+    var bgList = document.getElementById('bgList');
+    var musicBtn = document.getElementById('navMusicBtn');
+    var musicWidget = document.getElementById('musicWidget');
+    var musicList = document.getElementById('musicList');
+    var musicNow = document.getElementById('musicNow');
+    var musicSeek = document.getElementById('musicSeek');
+    var musicCur = document.getElementById('musicCur');
+    var musicDur = document.getElementById('musicDur');
+    var musicPlayBtn = document.getElementById('musicPlayBtn');
+    var musicPlayImg = document.getElementById('musicPlayImg');
+    var audio = null;
+    var currentMp3 = '';
+    var currentLabel = '';
+    var KEY_ALPHA = 'thome-glass-alpha';
+    var KEY_OPACITY = 'thome-glass-opacity';
+    var KEY_BG = 'thome-bg';
+
+    function setVar(name, v) {
+      document.documentElement.style.setProperty(name, String(v));
+    }
+    function applyAlpha(v) {
+      setVar('--glass-alpha', v / 100);
+      try { localStorage.setItem(KEY_ALPHA, String(v)); } catch (e) {}
+    }
+    function applyOpacity(v) {
+      setVar('--glass-opacity', v / 100);
+      try { localStorage.setItem(KEY_OPACITY, String(v)); } catch (e) {}
+    }
+    alpha.addEventListener('input', function () {
+      alphaVal.textContent = alpha.value + '%';
+      applyAlpha(alpha.value);
+    });
+    opacity.addEventListener('input', function () {
+      opacityVal.textContent = opacity.value + '%';
+      applyOpacity(opacity.value);
+    });
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      pop.hidden = !pop.hidden;
+    });
+    musicBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      musicList.hidden = !musicList.hidden;
+    });
+    document.addEventListener('click', function (e) {
+      if (!pop.hidden && !(pop.contains(e.target) || btn.contains(e.target))) {
+        pop.hidden = true;
+      }
+      if (!musicList.hidden && !musicWidget.contains(e.target)) {
+        musicList.hidden = true;
+      }
+    });
+    function applyBg(url) {
+      if (url) {
+        document.body.style.backgroundImage = 'url("' + url + '")';
+      } else {
+        document.body.style.backgroundImage = '';
+      }
+    }
+    function markActive(url) {
+      var opts = bgList.querySelectorAll('.bg-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-bg') === url);
+      }
+    }
+    bgList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== bgList && !(t.getAttribute && t.getAttribute('data-bg'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-bg') : null;
+      if (!url) return;
+      applyBg(url);
+      try { localStorage.setItem(KEY_BG, url); } catch (e) {}
+      markActive(url);
+    });
+    function setMusicNow(text) {
+      musicNow.textContent = text;
+    }
+    function markMusicActive(url) {
+      var opts = musicList.querySelectorAll('.music-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-mp3') === url);
+      }
+    }
+    function stopAudio() {
+      if (audio) {
+        audio.pause();
+        audio = null;
+      }
+      currentMp3 = '';
+      currentLabel = '';
+      musicBtn.classList.remove('mw-playing');
+      musicSeek.value = 0;
+      musicCur.textContent = '0:00';
+      musicDur.textContent = '0:00';
+      syncPlayBtn();
+    }
+    /* 播放控制按钮图标联动：有曲目时显示，播放=stop 样式，暂停=play 样式 */
+    function syncPlayBtn() {
+      if (audio && currentMp3) {
+        musicPlayBtn.hidden = false;
+        musicPlayImg.src = audio.paused ? '/text/play.png' : '/text/stop.png';
+      } else {
+        musicPlayBtn.hidden = true;
+      }
+    }
+    musicPlayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!audio || !currentMp3) return;
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('mw-playing');
+        setMusicNow('正在播放：' + currentLabel);
+        syncPlayBtn();
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('mw-playing');
+        setMusicNow('已暂停：' + currentLabel);
+        syncPlayBtn();
+      }
+    });
+    function fmtTime(t) {
+      t = Math.floor(t || 0);
+      var m = Math.floor(t / 60);
+      var s = t % 60;
+      return m + ':' + (s < 10 ? '0' + s : '' + s);
+    }
+    function updateProgress() {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        musicSeek.value = Math.round(audio.currentTime / audio.duration * 1000);
+        musicCur.textContent = fmtTime(audio.currentTime);
+        musicDur.textContent = fmtTime(audio.duration);
+      }
+    }
+    musicList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== musicList && !(t.getAttribute && t.getAttribute('data-mp3'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-mp3') : null;
+      var label = t && t.textContent ? t.textContent : url;
+      if (!url) return;
+      if (currentMp3 === url) {
+        if (audio && !audio.paused) {
+          audio.pause();
+          musicBtn.classList.remove('mw-playing');
+          setMusicNow('已暂停：' + label);
+          syncPlayBtn();
+        } else if (audio) {
+          audio.play();
+          musicBtn.classList.add('mw-playing');
+          setMusicNow('正在播放：' + label);
+          syncPlayBtn();
+        }
+        return;
+      }
+      stopAudio();
+      currentMp3 = url;
+      currentLabel = label;
+      audio = new Audio(url);
+      audio.addEventListener('loadedmetadata', updateProgress);
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', function () {
+        musicBtn.classList.remove('mw-playing');
+        currentMp3 = '';
+        currentLabel = '';
+        setMusicNow('播放结束：' + label);
+        markMusicActive('');
+        syncPlayBtn();
+      });
+      audio.play();
+      musicBtn.classList.add('mw-playing');
+      setMusicNow('正在播放：' + label);
+      markMusicActive(url);
+      syncPlayBtn();
+    });
+    /* 进度条拖动 seek：拖动不中断音频流 */
+    musicSeek.addEventListener('input', function () {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = audio.duration * musicSeek.value / 1000;
+        musicCur.textContent = fmtTime(audio.currentTime);
+      }
+    });
+    /* 组件拖动：mousedown/mousemove/mouseup，限制在视口内，避开按钮与进度条 */
+    var mwDrag = null;
+    musicWidget.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      e.preventDefault();
+      var rect = musicWidget.getBoundingClientRect();
+      musicWidget.style.left = rect.left + 'px';
+      musicWidget.style.top = rect.top + 'px';
+      musicWidget.style.bottom = 'auto';
+      musicWidget.style.right = 'auto';
+      mwDrag = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!mwDrag) return;
+      var x = e.clientX - mwDrag.dx;
+      var y = e.clientY - mwDrag.dy;
+      x = Math.max(0, Math.min(x, window.innerWidth - musicWidget.offsetWidth));
+      y = Math.max(0, Math.min(y, window.innerHeight - musicWidget.offsetHeight));
+      musicWidget.style.left = x + 'px';
+      musicWidget.style.top = y + 'px';
+    });
+    document.addEventListener('mouseup', function () {
+      mwDrag = null;
+    });
+    /* 页面加载时恢复已保存设置 */
+    try {
+      var a = localStorage.getItem(KEY_ALPHA);
+      if (a !== null) {
+        alpha.value = a;
+        alphaVal.textContent = a + '%';
+        setVar('--glass-alpha', Number(a) / 100);
+      }
+      var o = localStorage.getItem(KEY_OPACITY);
+      if (o !== null) {
+        opacity.value = o;
+        opacityVal.textContent = o + '%';
+        setVar('--glass-opacity', Number(o) / 100);
+      }
+      var b = localStorage.getItem(KEY_BG);
+      if (b) {
+        var url = b;
+        try {
+          var obj = JSON.parse(b);
+          if (obj && obj.type === 'upload' && obj.data) url = obj.data;
+        } catch (e) {}
+        if (url) {
+          applyBg(url);
+          markActive(url);
+        }
+      }
+    } catch (e) {}
+    syncPlayBtn();
+  })();
+  </script>
+
+<div class="wrap">
+  <div class="panel">
+    <h1>下载中心</h1>
+    <div class="crumb"><a href="/download">下载中心</a><span class="sep">/</span><span class="cur">美化包</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th>名称</th>
+          <th class="col-size">大小</th>
+          <th class="col-time">修改时间</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/GOC%E5%85%A8%E6%81%AF%E6%9B%BF%E6%8D%A2%E5%85%A8%E6%81%AF%E7%9E%84%E5%85%B7%EF%BC%88%E5%B7%B2%E4%BF%AE%E5%A4%8D%E6%9D%90%E8%B4%A8%E9%97%AE%E9%A2%98%EF%BC%89.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/GOC%E5%85%A8%E6%81%AF%E6%9B%BF%E6%8D%A2%E5%85%A8%E6%81%AF%E7%9E%84%E5%85%B7%EF%BC%88%E5%B7%B2%E4%BF%AE%E5%A4%8D%E6%9D%90%E8%B4%A8%E9%97%AE%E9%A2%98%EF%BC%89.zip"><span class="ico">&#128196;</span>GOC全息替换全息瞄具（已修复材质问题）.zip</a></td><td class="size">4.3 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/GOC%E5%A5%87%E6%95%B0%E7%9E%84%E5%85%B7%E6%9B%BF%E6%8D%A2aimpoint%E7%9E%84%E5%85%B7%28%E5%B7%B2%E4%BF%AE%E5%A4%8D%E6%9D%90%E8%B4%A8%E9%97%AE%E9%A2%98%EF%BC%89.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/GOC%E5%A5%87%E6%95%B0%E7%9E%84%E5%85%B7%E6%9B%BF%E6%8D%A2aimpoint%E7%9E%84%E5%85%B7%28%E5%B7%B2%E4%BF%AE%E5%A4%8D%E6%9D%90%E8%B4%A8%E9%97%AE%E9%A2%98%EF%BC%89.zip"><span class="ico">&#128196;</span>GOC奇数瞄具替换aimpoint瞄具(已修复材质问题）.zip</a></td><td class="size">3.4 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/GOC%E6%A0%B8%E5%BC%B9%E9%9F%B3%E4%B9%90%E6%9B%BF%E6%8D%A2.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/GOC%E6%A0%B8%E5%BC%B9%E9%9F%B3%E4%B9%90%E6%9B%BF%E6%8D%A2.zip"><span class="ico">&#128196;</span>GOC核弹音乐替换.zip</a></td><td class="size">27.6 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/mio%E6%9C%8D%E5%B0%91%E5%89%8D%E6%9D%83%E9%99%90%E5%8D%A1%E7%BE%8E%E5%8C%96Luar.7z"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/mio%E6%9C%8D%E5%B0%91%E5%89%8D%E6%9D%83%E9%99%90%E5%8D%A1%E7%BE%8E%E5%8C%96Luar.7z"><span class="ico">&#128196;</span>mio服少前权限卡美化Luar.7z</a></td><td class="size">9.3 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/saber%20alter%20sq300.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/saber%20alter%20sq300.zip"><span class="ico">&#128196;</span>saber alter sq300.zip</a></td><td class="size">3.0 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E4%B8%89%E8%84%9A%E7%8C%ABvmx%E6%97%A0%E6%A1%86%E7%BA%AF%E7%99%BD%E7%9E%84%E5%85%B7%E6%9B%BF%E6%8D%A2cmore%E7%9E%84%E5%85%B7%28%E9%87%8D%E7%BD%AE%E7%89%88%EF%BC%89.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E4%B8%89%E8%84%9A%E7%8C%ABvmx%E6%97%A0%E6%A1%86%E7%BA%AF%E7%99%BD%E7%9E%84%E5%85%B7%E6%9B%BF%E6%8D%A2cmore%E7%9E%84%E5%85%B7%28%E9%87%8D%E7%BD%AE%E7%89%88%EF%BC%89.zip"><span class="ico">&#128196;</span>三脚猫vmx无框纯白瞄具替换cmore瞄具(重置版）.zip</a></td><td class="size">6.8 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E5%88%9D%E9%9F%B3%E6%9C%AA%E6%9D%A5blackout%28%E5%8F%AF%E7%9B%B4%E6%8E%A5%E8%A7%A3%E5%8E%8B%E4%BD%BF%E7%94%A8%29.7z"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E5%88%9D%E9%9F%B3%E6%9C%AA%E6%9D%A5blackout%28%E5%8F%AF%E7%9B%B4%E6%8E%A5%E8%A7%A3%E5%8E%8B%E4%BD%BF%E7%94%A8%29.7z"><span class="ico">&#128196;</span>初音未来blackout(可直接解压使用).7z</a></td><td class="size">1.5 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E5%8D%B0%E8%8A%B1%E9%9B%86%E6%B8%90%E5%8F%98%E6%B6%88%E9%98%B2%E6%96%A7.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E5%8D%B0%E8%8A%B1%E9%9B%86%E6%B8%90%E5%8F%98%E6%B6%88%E9%98%B2%E6%96%A7.zip"><span class="ico">&#128196;</span>印花集渐变消防斧.zip</a></td><td class="size">712.1 KB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E6%9B%BF%E6%8D%A2%E5%A4%A7%E9%83%A8%E5%88%86%E9%97%A8%E9%9F%B3%E6%95%88%E4%B8%BAMC.rar"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E6%9B%BF%E6%8D%A2%E5%A4%A7%E9%83%A8%E5%88%86%E9%97%A8%E9%9F%B3%E6%95%88%E4%B8%BAMC.rar"><span class="ico">&#128196;</span>替换大部分门音效为MC.rar</a></td><td class="size">5.2 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E6%9F%94%E6%83%85O4%E6%9B%BF%E6%8D%A2%E9%97%AE%E5%8F%B7%E5%8D%A12.0.rar"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E6%9F%94%E6%83%85O4%E6%9B%BF%E6%8D%A2%E9%97%AE%E5%8F%B7%E5%8D%A12.0.rar"><span class="ico">&#128196;</span>柔情O4替换问号卡2.0.rar</a></td><td class="size">462.1 KB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E7%94%B5%E7%A3%81%E7%82%AE%E9%9F%B3%E5%93%8D%E6%9B%BF%E6%8D%A2%E5%A4%A7%E7%8B%97%E5%8F%AB.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E7%94%B5%E7%A3%81%E7%82%AE%E9%9F%B3%E5%93%8D%E6%9B%BF%E6%8D%A2%E5%A4%A7%E7%8B%97%E5%8F%AB.zip"><span class="ico">&#128196;</span>电磁炮音响替换大狗叫.zip</a></td><td class="size">47.0 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E8%8B%B1%E9%9B%84%E8%81%94%E7%9B%9Fui%E6%9B%BF%E6%8D%A2.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E8%8B%B1%E9%9B%84%E8%81%94%E7%9B%9Fui%E6%9B%BF%E6%8D%A2.zip"><span class="ico">&#128196;</span>英雄联盟ui替换.zip</a></td><td class="size">8.0 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E8%AF%95%E9%AA%8C%E6%8D%A2%E5%9E%8B%E5%88%80.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E8%AF%95%E9%AA%8C%E6%8D%A2%E5%9E%8B%E5%88%80.zip"><span class="ico">&#128196;</span>试验换型刀.zip</a></td><td class="size">17.5 MB</td><td class="time"></td></tr>
+<tr class="row file" data-href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E9%97%A8.zip"><td class="name"><a href="/download/%E7%BE%8E%E5%8C%96%E5%8C%85/%E9%97%A8.zip"><span class="ico">&#128196;</span>门.zip</a></td><td class="size">3.2 MB</td><td class="time"></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  (function () {
+    var rows = document.querySelectorAll('tr.row[data-href]');
+    Array.prototype.forEach.call(rows, function (row) {
+      row.addEventListener('click', function (event) {
+        if (event.target.closest('a')) { return; }
+        window.location.href = row.getAttribute('data-href');
+      });
+    });
+  })();
+</script>
+</body>
+</html>
