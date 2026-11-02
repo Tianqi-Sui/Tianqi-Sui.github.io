@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>俄罗斯方块 · 小游戏中心</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+  /* 全站液态玻璃统一变量（设置面板滑块实时驱动） */
+  :root {
+    --glass-alpha: 1; /* 亮度：玻璃底色浓淡乘数 0.25~1，作用与历史版本一致 */
+    --glass-opacity: 1; /* 不透明度：0~1。0 时玻璃背景/模糊/边框完全透明可透过后方图片，1 时与默认一致 */
+  }
+  /* 顶部跳转栏 */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    height: 58px;
+    padding: 0 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.62)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.16)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    position: relative;
+    z-index: 10;
+  }
+  .nav a {
+    font-family: SimSun, "宋体", "Songti SC", serif;
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav a:hover { text-decoration: underline; }
+  .nav a.home {
+    font-size: 22px;
+    color: #1a6dff;
+  }
+  .nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav .nav-setting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.34)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.14)));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    cursor: pointer;
+  }
+  .nav .nav-setting img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .nav .nav-setting:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.24)));
+  }
+  .music-widget .nav-music {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 12px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.5)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .nav-music .nm-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2bd6ff, #ff5fa8);
+  }
+  .music-widget .nav-music img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .nav-music:hover {
+    transform: scale(1.06);
+  }
+  .glass-pop {
+    position: absolute;
+    top: 66px;
+    right: 16px;
+    width: 320px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.78)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.46)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.24)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 999;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+  }
+  .glass-pop[hidden] { display: none; }
+  /* 音乐播放器独立浮动组件：默认固定于页面左下角，可鼠标拖动（刷新回默认位） */
+  .music-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.80)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.22)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 998;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+  }
+  .music-widget .mw-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .music-widget .mw-playbtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 8px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.45)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .mw-playbtn[hidden] { display: none; }
+  .music-widget .mw-playbtn img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .mw-playbtn:hover {
+    transform: scale(1.08);
+  }
+  .music-widget .mw-now {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.8);
+    min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* 播放旋转：内芯持续旋转，播放时 running / 暂停时 paused（保持角度，平滑过渡） */
+  @keyframes mw-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .music-widget .nav-music .nm-inner {
+    animation: mw-spin 2.4s linear infinite;
+    animation-play-state: paused;
+  }
+  .music-widget .nav-music.mw-playing .nm-inner {
+    animation-play-state: running;
+  }
+  .mw-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mw-time {
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.75);
+    min-width: 34px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  #musicSeek {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff5fa8, #2bd6ff);
+    outline: none;
+    cursor: pointer;
+  }
+  #musicSeek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
+  }
+  #musicSeek::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    cursor: pointer;
+  }
+  .mw-list {
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .music-widget .mw-list[hidden] { display: none; }
+  .mw-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.6);
+  }
+  .gp-head {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .gp-row {
+    margin-bottom: 12px;
+  }
+  .gp-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .gp-row input[type="range"] {
+    width: 100%;
+    accent-color: #1a6dff;
+    vertical-align: middle;
+  }
+  .gp-val {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 40px;
+  }
+  .gp-bglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .bg-opt {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    color: #ffffff;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-opt:hover {
+    background: linear-gradient(135deg, rgba(138, 92, 255, 0.9), rgba(138, 92, 255, 0.4));
+  }
+  .bg-opt.active {
+    border-color: rgba(255, 255, 255, calc(var(--glass-alpha) * 0.95));
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.5));
+    box-shadow: 0 0 14px rgba(138, 92, 255, calc(var(--glass-alpha) * 0.7)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+  }
+  .gp-empty {
+    font-size: 13px;
+    color: rgba(17, 17, 17, 0.7);
+    padding: 4px 2px;
+  }
+  .gp-note {
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.65);
+  }
+  /* 全站自定义光标：m-1 默认箭头（text 目录本地资源，零外链） */
+  body {
+    cursor: url('/text/m-1.png') 0 0, auto;
+  }
+  /* m-2 手型：所有可点击元素（含各页面 .dl-btn/.plot-btn/.seg-btn/tr.row/棋盘等） */
+  a, button, .bg-opt, .nav-setting, .dl-btn, .plot-btn, .seg-btn, tr.row,
+  .board-area canvas, [role="button"], [onclick], select, summary, label,
+  input[type="submit"], input[type="radio"], input[type="checkbox"], input[type="file"] {
+    cursor: url('/text/m-2.png') 0 0, pointer !important;
+  }
+  /* 全站液态玻璃滚动条：轨道玻璃半透明、滑块粉色 100% -> 30% 渐变、圆角+内高光，hover 加深 */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.12)));
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 1), rgba(255, 105, 180, 0.3));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 0.95), rgba(255, 105, 180, 0.5));
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+
+body{font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;min-height:100vh;color:#e2e8f0;user-select:none;background-color:#0f172a;}
+.glass{background:rgba(15,23,42,calc(var(--glass-alpha, .85) * .72));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:16px;}
+.t-wrap{display:flex;gap:14px;justify-content:center;align-items:flex-start;flex-wrap:wrap;padding:18px 14px 30px;max-width:1000px;margin:0 auto;}
+.t-side{display:flex;flex-direction:column;gap:12px;width:172px;min-width:172px;}
+.t-panel{padding:12px;}
+.t-panel h3{margin-bottom:8px;font-size:12px;color:#94a3b8;letter-spacing:2px;font-weight:600;}
+canvas{display:block;border-radius:10px;}
+#boardCan{background:rgba(2,6,23,.6);border:1px solid rgba(255,255,255,.14);}
+.miniCan{background:rgba(2,6,23,.4);border:1px solid rgba(255,255,255,.08);}
+.stat{font-size:14px;margin:7px 0;display:flex;justify-content:space-between;color:#cbd5e1;}
+.stat b{font-variant-numeric:tabular-nums;color:#f8fafc;}
+.ops{font-size:12px;color:#94a3b8;line-height:2;}
+.k{display:inline-block;min-width:24px;text-align:center;background:rgba(255,255,255,.14);border-radius:5px;padding:1px 5px;margin-right:4px;font-size:11px;color:#f8fafc;font-weight:600;}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.74);z-index:60;}
+.menu{max-width:360px;width:88%;padding:26px 30px;text-align:center;}
+.menu h2{font-size:22px;margin-bottom:10px;}
+.menu p{color:#94a3b8;font-size:13px;margin:6px 0;line-height:1.6;}
+.btn{display:inline-block;margin:8px 5px 2px;padding:10px 26px;border:0;border-radius:10px;cursor:pointer;font-size:15px;color:#fff;background:rgba(56,189,248,.9);transition:filter .15s;}
+.btn:hover{filter:brightness(1.12);}
+.btn.ghost{background:rgba(148,163,184,.3);}
+.hidden{display:none !important;}
+#pageBg{position:fixed;inset:0;background:url("/pictures/starlight-idol-celebration-2160.jpg") center/cover no-repeat;z-index:-2;}
+</style>
+</head>
+<body>
+<div id="pageBg"></div>
+  <nav class="nav">
+    <a class="home" href="/">主页</a>
+    <a href="/download">下载中心</a>
+    <a href="/games.html">小游戏中心</a>
+    <div class="nav-actions">
+      <button type="button" class="nav-setting" id="navSettingBtn" title="设置">
+        <img src="/text/setting.png" alt="设置">
+      </button>
+    </div>
+  </nav>
+  <div class="music-widget" id="musicWidget" title="可拖动，刷新回到默认位置">
+    <div class="mw-head">
+      <button type="button" class="nav-music" id="navMusicBtn" title="展开/收起曲目列表" aria-label="音乐播放器">
+        <span class="nm-inner"><img src="/text/music.png" alt="音乐"></span>
+      </button>
+      <div class="mw-now" id="musicNow">未播放</div>
+      <button type="button" class="mw-playbtn" id="musicPlayBtn" title="播放/暂停" aria-label="播放/暂停" hidden>
+        <img id="musicPlayImg" src="/text/play.png" alt="播放/暂停">
+      </button>
+    </div>
+    <div class="mw-progress">
+      <span class="mw-time" id="musicCur">0:00</span>
+      <input type="range" id="musicSeek" min="0" max="1000" value="0" step="1" aria-label="播放进度">
+      <span class="mw-time" id="musicDur">0:00</span>
+    </div>
+    <div class="gp-bglist mw-list" id="musicList" hidden>
+      <button type="button" class="bg-opt music-opt" data-mp3="/music/Shape%20of%20You.mp3">Shape of You.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E6%88%91%E6%9C%AC%E5%B0%86%E5%BF%83%E5%90%91%E6%98%8E%E6%9C%88.mp3">我本将心向明月.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%80%81%E7%94%B7%E5%AD%A9.mp3">老男孩.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%99%9E%E5%85%AE%E5%8F%B9.mp3">虞兮叹.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%9B%A8%E7%88%B1.mp3">雨爱.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%B8%B3%E9%B8%AF%E6%88%8F.mp3">鸳鸯戏.mp3</button>
+    </div>
+    <div class="mw-note">点击曲目播放，再次点击同一曲目暂停/继续；拖动进度条可跳转</div>
+  </div>
+  <div class="glass-pop" id="glassPop" hidden>
+    <div class="gp-head">站点设置</div>
+    <div class="gp-row">
+      <span class="gp-label">亮度</span>
+      <input type="range" id="glassAlpha" min="25" max="100" value="100" step="1">
+      <span class="gp-val" id="glassAlphaVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">不透明度</span>
+      <input type="range" id="glassOpacity" min="0" max="100" value="100" step="1">
+      <span class="gp-val" id="glassOpacityVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">背景图片（C:\Thome\Pictures）</span>
+      <div class="gp-bglist" id="bgList">
+        <button type="button" class="bg-opt" data-bg="/pictures/fragmented-pink-haired-pilot-2160.png">fragmented-pink-haired-pilot-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/holiday-morning-glow-2160.png">holiday-morning-glow-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-grid-descent-2160.png">neon-grid-descent-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-tower-runner-2160.png">neon-tower-runner-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pastel-dessert-table-2160.png">pastel-dessert-table-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pink-haired-girl-and-plushies-2160.jpg">pink-haired-girl-and-plushies-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-idol-celebration-2160.jpg">starlight-idol-celebration-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-reverie-2160.jpg">starlight-reverie-2160.jpg</button>
+      </div>
+    </div>
+    <div class="gp-note">改动实时生效，自动保存在本机浏览器</div>
+  </div>
+  <script>
+  (function () {
+    var pop = document.getElementById('glassPop');
+    var btn = document.getElementById('navSettingBtn');
+    var alpha = document.getElementById('glassAlpha');
+    var alphaVal = document.getElementById('glassAlphaVal');
+    var opacity = document.getElementById('glassOpacity');
+    var opacityVal = document.getElementById('glassOpacityVal');
+    var bgList = document.getElementById('bgList');
+    var musicBtn = document.getElementById('navMusicBtn');
+    var musicWidget = document.getElementById('musicWidget');
+    var musicList = document.getElementById('musicList');
+    var musicNow = document.getElementById('musicNow');
+    var musicSeek = document.getElementById('musicSeek');
+    var musicCur = document.getElementById('musicCur');
+    var musicDur = document.getElementById('musicDur');
+    var musicPlayBtn = document.getElementById('musicPlayBtn');
+    var musicPlayImg = document.getElementById('musicPlayImg');
+    var audio = null;
+    var currentMp3 = '';
+    var currentLabel = '';
+    var KEY_ALPHA = 'thome-glass-alpha';
+    var KEY_OPACITY = 'thome-glass-opacity';
+    var KEY_BG = 'thome-bg';
+
+    function setVar(name, v) {
+      document.documentElement.style.setProperty(name, String(v));
+    }
+    function applyAlpha(v) {
+      setVar('--glass-alpha', v / 100);
+      try { localStorage.setItem(KEY_ALPHA, String(v)); } catch (e) {}
+    }
+    function applyOpacity(v) {
+      setVar('--glass-opacity', v / 100);
+      try { localStorage.setItem(KEY_OPACITY, String(v)); } catch (e) {}
+    }
+    alpha.addEventListener('input', function () {
+      alphaVal.textContent = alpha.value + '%';
+      applyAlpha(alpha.value);
+    });
+    opacity.addEventListener('input', function () {
+      opacityVal.textContent = opacity.value + '%';
+      applyOpacity(opacity.value);
+    });
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      pop.hidden = !pop.hidden;
+    });
+    musicBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      musicList.hidden = !musicList.hidden;
+    });
+    document.addEventListener('click', function (e) {
+      if (!pop.hidden && !(pop.contains(e.target) || btn.contains(e.target))) {
+        pop.hidden = true;
+      }
+      if (!musicList.hidden && !musicWidget.contains(e.target)) {
+        musicList.hidden = true;
+      }
+    });
+    function applyBg(url) {
+      if (url) {
+        document.body.style.backgroundImage = 'url("' + url + '")';
+      } else {
+        document.body.style.backgroundImage = '';
+      }
+    }
+    function markActive(url) {
+      var opts = bgList.querySelectorAll('.bg-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-bg') === url);
+      }
+    }
+    bgList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== bgList && !(t.getAttribute && t.getAttribute('data-bg'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-bg') : null;
+      if (!url) return;
+      applyBg(url);
+      try { localStorage.setItem(KEY_BG, url); } catch (e) {}
+      markActive(url);
+    });
+    function setMusicNow(text) {
+      musicNow.textContent = text;
+    }
+    function markMusicActive(url) {
+      var opts = musicList.querySelectorAll('.music-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-mp3') === url);
+      }
+    }
+    function stopAudio() {
+      if (audio) {
+        audio.pause();
+        audio = null;
+      }
+      currentMp3 = '';
+      currentLabel = '';
+      musicBtn.classList.remove('mw-playing');
+      musicSeek.value = 0;
+      musicCur.textContent = '0:00';
+      musicDur.textContent = '0:00';
+      syncPlayBtn();
+    }
+    /* 播放控制按钮图标联动：有曲目时显示，播放=stop 样式，暂停=play 样式 */
+    function syncPlayBtn() {
+      if (audio && currentMp3) {
+        musicPlayBtn.hidden = false;
+        musicPlayImg.src = audio.paused ? '/text/play.png' : '/text/stop.png';
+      } else {
+        musicPlayBtn.hidden = true;
+      }
+    }
+    musicPlayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!audio || !currentMp3) return;
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('mw-playing');
+        setMusicNow('正在播放：' + currentLabel);
+        syncPlayBtn();
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('mw-playing');
+        setMusicNow('已暂停：' + currentLabel);
+        syncPlayBtn();
+      }
+    });
+    function fmtTime(t) {
+      t = Math.floor(t || 0);
+      var m = Math.floor(t / 60);
+      var s = t % 60;
+      return m + ':' + (s < 10 ? '0' + s : '' + s);
+    }
+    function updateProgress() {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        musicSeek.value = Math.round(audio.currentTime / audio.duration * 1000);
+        musicCur.textContent = fmtTime(audio.currentTime);
+        musicDur.textContent = fmtTime(audio.duration);
+      }
+    }
+    musicList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== musicList && !(t.getAttribute && t.getAttribute('data-mp3'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-mp3') : null;
+      var label = t && t.textContent ? t.textContent : url;
+      if (!url) return;
+      if (currentMp3 === url) {
+        if (audio && !audio.paused) {
+          audio.pause();
+          musicBtn.classList.remove('mw-playing');
+          setMusicNow('已暂停：' + label);
+          syncPlayBtn();
+        } else if (audio) {
+          audio.play();
+          musicBtn.classList.add('mw-playing');
+          setMusicNow('正在播放：' + label);
+          syncPlayBtn();
+        }
+        return;
+      }
+      stopAudio();
+      currentMp3 = url;
+      currentLabel = label;
+      audio = new Audio(url);
+      audio.addEventListener('loadedmetadata', updateProgress);
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', function () {
+        musicBtn.classList.remove('mw-playing');
+        currentMp3 = '';
+        currentLabel = '';
+        setMusicNow('播放结束：' + label);
+        markMusicActive('');
+        syncPlayBtn();
+      });
+      audio.play();
+      musicBtn.classList.add('mw-playing');
+      setMusicNow('正在播放：' + label);
+      markMusicActive(url);
+      syncPlayBtn();
+    });
+    /* 进度条拖动 seek：拖动不中断音频流 */
+    musicSeek.addEventListener('input', function () {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = audio.duration * musicSeek.value / 1000;
+        musicCur.textContent = fmtTime(audio.currentTime);
+      }
+    });
+    /* 组件拖动：mousedown/mousemove/mouseup，限制在视口内，避开按钮与进度条 */
+    var mwDrag = null;
+    musicWidget.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      e.preventDefault();
+      var rect = musicWidget.getBoundingClientRect();
+      musicWidget.style.left = rect.left + 'px';
+      musicWidget.style.top = rect.top + 'px';
+      musicWidget.style.bottom = 'auto';
+      musicWidget.style.right = 'auto';
+      mwDrag = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!mwDrag) return;
+      var x = e.clientX - mwDrag.dx;
+      var y = e.clientY - mwDrag.dy;
+      x = Math.max(0, Math.min(x, window.innerWidth - musicWidget.offsetWidth));
+      y = Math.max(0, Math.min(y, window.innerHeight - musicWidget.offsetHeight));
+      musicWidget.style.left = x + 'px';
+      musicWidget.style.top = y + 'px';
+    });
+    document.addEventListener('mouseup', function () {
+      mwDrag = null;
+    });
+    /* 页面加载时恢复已保存设置 */
+    try {
+      var a = localStorage.getItem(KEY_ALPHA);
+      if (a !== null) {
+        alpha.value = a;
+        alphaVal.textContent = a + '%';
+        setVar('--glass-alpha', Number(a) / 100);
+      }
+      var o = localStorage.getItem(KEY_OPACITY);
+      if (o !== null) {
+        opacity.value = o;
+        opacityVal.textContent = o + '%';
+        setVar('--glass-opacity', Number(o) / 100);
+      }
+      var b = localStorage.getItem(KEY_BG);
+      if (b) {
+        var url = b;
+        try {
+          var obj = JSON.parse(b);
+          if (obj && obj.type === 'upload' && obj.data) url = obj.data;
+        } catch (e) {}
+        if (url) {
+          applyBg(url);
+          markActive(url);
+        }
+      }
+    } catch (e) {}
+    syncPlayBtn();
+  })();
+  </script>
+
+<div class="t-wrap">
+  <div class="t-side">
+    <div class="t-panel glass"><h3>HOLD</h3><canvas id="holdCan" class="miniCan" width="146" height="74"></canvas></div>
+    <div class="t-panel glass"><h3>NEXT ×3</h3><canvas id="nextCan" class="miniCan" width="146" height="216"></canvas></div>
+    <div class="t-panel glass">
+      <div class="stat">得分<b id="stScore">0</b></div>
+      <div class="stat">等级<b id="stLevel">1</b></div>
+      <div class="stat">消行<b id="stLines">0</b></div>
+      <div class="stat">最高分<b id="stBest">0</b></div>
+    </div>
+    <div class="t-panel glass">
+      <h3>操作</h3>
+      <div class="ops"><span class="k">←</span><span class="k">→</span> 移动　<span class="k">↑</span> 旋转</div>
+      <div class="ops"><span class="k">↓</span> 软降　<span class="k">空格</span> 硬降</div>
+      <div class="ops"><span class="k">C</span> 暂存　<span class="k">P</span> 暂停</div>
+      <div class="ops"><span class="k">R</span> 重新开始</div>
+    </div>
+  </div>
+  <div><canvas id="boardCan" width="300" height="600"></canvas></div>
+  <div class="t-side"></div>
+</div>
+
+<div class="overlay hidden" id="overlay">
+  <div class="menu glass">
+    <h2 id="ovTitle">俄罗斯方块</h2>
+    <p id="ovMsg"></p>
+    <div><button class="btn" id="ovStart">开始游戏</button></div>
+    <div><button class="btn ghost hidden" id="ovRestart">再来一局</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var COLS=10,ROWS=20,CELL=30;
+var bctx=document.getElementById('boardCan').getContext('2d');
+var hctx=document.getElementById('holdCan').getContext('2d');
+var nctx=document.getElementById('nextCan').getContext('2d');
+var LS='thome-tetris-';
+var SHAPES=[
+ {t:'I',c:'#22d3ee',m:[[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]]},
+ {t:'O',c:'#facc15',m:[[1,1],[1,1]]},
+ {t:'T',c:'#c084fc',m:[[0,1,0],[1,1,1],[0,0,0]]},
+ {t:'S',c:'#4ade80',m:[[0,1,1],[1,1,0],[0,0,0]]},
+ {t:'Z',c:'#f87171',m:[[1,1,0],[0,1,1],[0,0,0]]},
+ {t:'J',c:'#60a5fa',m:[[1,0,0],[1,1,1],[0,0,0]]},
+ {t:'L',c:'#fb923c',m:[[0,0,1],[1,1,1],[0,0,0]]}
+];
+function S(t){for(var i=0;i<SHAPES.length;i++)if(SHAPES[i].t===t)return SHAPES[i];return SHAPES[0];}
+function rotate(m){var n=m.length,o=[];for(var i=0;i<n;i++){o[i]=[];for(var j=0;j<n;j++)o[i][j]=m[n-1-j][i];}return o;}
+var board,cur,hold=null,queue=[],score=0,lines=0,level=1,combo=0,holdUsed=false,state='menu',last=0;
+var best=parseInt(localStorage.getItem(LS+'best')||'0',10)||0;
+function empty(){board=[];for(var y=0;y<ROWS;y++){board.push([]);for(var x=0;x<COLS;x++)board[y].push(0);}}
+function randT(){return SHAPES[Math.floor(Math.random()*SHAPES.length)].t;}
+function newP(t){var s=S(t);return {t:t,rot:0,x:Math.floor((COLS-s.m.length)/2),y:0};}
+function cells(p){var m=S(p.t).m;for(var r=0;r<p.rot;r++)m=rotate(m);return m;}
+function hit(p,dx,dy){var m=cells(p);for(var i=0;i<m.length;i++)for(var j=0;j<m.length;j++)if(m[i][j]){var X=p.x+j+dx,Y=p.y+i+dy;if(X<0||X>=COLS||Y>=ROWS)return true;if(Y>=0&&board[Y][X])return true;}return false;}
+function lock(){var m=cells(cur);for(var i=0;i<m.length;i++)for(var j=0;j<m.length;j++)if(m[i][j]&&cur.y+i>=0)board[cur.y+i][cur.x+j]=cur.t;clearL();holdUsed=false;spawn();}
+function clearL(){var full=[];for(var y=ROWS-1;y>=0;y--){var f=true;for(var x=0;x<COLS;x++)if(!board[y][x]){f=false;break;}if(f)full.push(y);}
+ if(!full.length){combo=0;return;}
+ for(var i=0;i<full.length;i++){board.splice(full[i],1);board.unshift([]);for(var x=0;x<COLS;x++)board[0].push(0);}
+ combo++;var base=[0,100,300,500,800];score+=(base[full.length]||800)*level+50*(combo-1);lines+=full.length;level=1+Math.floor(lines/10);ui();}
+function spawn(){while(queue.length<3)queue.push(randT());cur=newP(queue.shift());if(hit(cur,0,0)){over();return;}draw();}
+function holdSwap(){if(holdUsed||state!=='playing')return;var t=cur.t;if(hold===null){hold=t;spawn();}else{cur=newP(t);hold=t;holdUsed=true;}holdUsed=true;draw();}
+function soft(){if(state!=='playing')return;if(hit(cur,0,1)){lock();draw();}else{cur.y++;score++;ui();draw();}}
+function hard(){if(state!=='playing')return;var d=0;while(!hit(cur,0,1)){cur.y++;d++;}score+=d*2;lock();draw();}
+function rot(){if(state!=='playing')return;var p={t:cur.t,rot:(cur.rot+1)%4,x:cur.x,y:cur.y};var ks=[0,-1,1,-2,2];for(var k=0;k<ks.length;k++){p.x=cur.x+ks[k];if(!hit(p,0,0)){cur.rot=p.rot;cur.x=p.x;draw();return;}}}
+function move(dx){if(state!=='playing')return;if(!hit(cur,dx,0)){cur.x+=dx;draw();}}
+function gy(){var y=cur.y;while(!hit(cur,0,y-cur.y+1))y++;return y;}
+function blk(ctx,x,y,c){ctx.fillStyle=c;ctx.fillRect(x+1,y+1,CELL-2,CELL-2);ctx.fillStyle='rgba(255,255,255,.25)';ctx.fillRect(x+3,y+3,CELL-8,5);ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(x+3,y+CELL-8,CELL-8,5);}
+function draw(){
+ bctx.clearRect(0,0,300,600);
+ for(var y=0;y<ROWS;y++)for(var x=0;x<COLS;x++)if(board[y][x])blk(bctx,x*CELL,y*CELL,S(board[y][x]).c);
+ bctx.strokeStyle='rgba(255,255,255,.05)';
+ for(var x=1;x<COLS;x++){bctx.beginPath();bctx.moveTo(x*CELL+.5,0);bctx.lineTo(x*CELL+.5,600);bctx.stroke();}
+ for(var y=1;y<ROWS;y++){bctx.beginPath();bctx.moveTo(0,y*CELL+.5);bctx.lineTo(300,y*CELL+.5);bctx.stroke();}
+ if(state==='playing'||state==='paused'){
+  var m=cells(cur),gh=gy();
+  for(var i=0;i<m.length;i++)for(var j=0;j<m.length;j++)if(m[i][j]){bctx.fillStyle='rgba(255,255,255,.16)';bctx.fillRect((cur.x+j)*CELL+2,(gh+i)*CELL+2,CELL-4,CELL-4);}
+  for(var i2=0;i2<m.length;i2++)for(var j2=0;j2<m.length;j2++)if(m[i2][j2]&&cur.y+i2>=0)blk(bctx,(cur.x+j2)*CELL,(cur.y+i2)*CELL,S(cur.t).c);
+ }
+ drawMini(hctx,hold,146,74);
+ drawNext();
+}
+function drawMini(ctx,t,W,H){ctx.clearRect(0,0,W,H);if(!t)return;var s=S(t),m=s.m;var size=Math.max(10,Math.min(20,Math.floor(Math.min(W,H)/m.length)-4));var oX=(W-m.length*size)/2,oY=(H-m.length*size)/2;ctx.fillStyle=s.c;for(var i=0;i<m.length;i++)for(var j=0;j<m.length;j++)if(m[i][j])ctx.fillRect(oX+j*size,oY+i*size,size-2,size-2);}
+function drawNext(){nctx.clearRect(0,0,146,216);for(var q=0;q<Math.min(3,queue.length);q++){var s=S(queue[q]),m=s.m,size=Math.max(10,Math.min(18,Math.floor(70/m.length)-4)),oX=(146-m.length*size)/2,oY=q*72+(72-m.length*size)/2;nctx.fillStyle=s.c;for(var i=0;i<m.length;i++)for(var j=0;j<m.length;j++)if(m[i][j])nctx.fillRect(oX+j*size,oY+i*size,size-2,size-2);}}
+function speed(){return Math.max(70,760-(level-1)*65);}
+function tick(){if(state!=='playing')return;if(hit(cur,0,1)){lock();draw();}else{cur.y++;draw();}}
+function loop(ts){if(state==='playing'&&ts-last>=speed()){last=ts;tick();}requestAnimationFrame(loop);}
+function ui(){document.getElementById('stScore').textContent=score;document.getElementById('stLevel').textContent=level;document.getElementById('stLines').textContent=lines;document.getElementById('stBest').textContent=best;}
+function ov(t,msg,showStart,showRestart){document.getElementById('ovTitle').textContent=t;document.getElementById('ovMsg').innerHTML=msg;document.getElementById('ovStart').classList.toggle('hidden',!showStart);document.getElementById('ovRestart').classList.toggle('hidden',!showRestart);document.getElementById('overlay').classList.remove('hidden');}
+function start(){empty();score=0;lines=0;level=1;combo=0;hold=null;holdUsed=false;queue=[randT(),randT(),randT()];spawn();state='playing';document.getElementById('overlay').classList.add('hidden');ui();}
+function pause(){if(state==='playing'){state='paused';ov('已暂停','按 P 继续，按 R 重新开始',false,true);}else if(state==='paused'){state='playing';document.getElementById('overlay').classList.add('hidden');}}
+function over(){state='gameover';if(score>best){best=score;localStorage.setItem(LS+'best',String(best));}ui();ov('游戏结束','得分 <b>'+score+'</b>，最高分 <b>'+best+'</b><br>按 R 再来一局',false,true);}
+document.getElementById('ovStart').onclick=start;
+document.getElementById('ovRestart').onclick=start;
+window.addEventListener('keydown',function(e){
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].indexOf(e.key)>-1)e.preventDefault();
+ var k=e.key;
+ if(k==='ArrowLeft')move(-1);
+ else if(k==='ArrowRight')move(1);
+ else if(k==='ArrowUp')rot();
+ else if(k==='ArrowDown')soft();
+ else if(k===' ')hard();
+ else if(k==='c'||k==='C')holdSwap();
+ else if(k==='p'||k==='P')pause();
+ else if(k==='r'||k==='R')start();
+});
+ui();
+requestAnimationFrame(loop);
+ov('俄罗斯方块','经典 10×20 落块消除<br>←→ 移动 · ↑ 旋转 · ↓ 软降 · 空格 硬降<br>C 暂存 · P 暂停 · R 重开',true,false);
+})();
+</script>
+</body>
+</html>

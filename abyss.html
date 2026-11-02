@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>暗渊回廊 · 小游戏中心</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+  /* 全站液态玻璃统一变量（设置面板滑块实时驱动） */
+  :root {
+    --glass-alpha: 1; /* 亮度：玻璃底色浓淡乘数 0.25~1，作用与历史版本一致 */
+    --glass-opacity: 1; /* 不透明度：0~1。0 时玻璃背景/模糊/边框完全透明可透过后方图片，1 时与默认一致 */
+  }
+  /* 顶部跳转栏 */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    height: 58px;
+    padding: 0 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.62)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.16)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    position: relative;
+    z-index: 10;
+  }
+  .nav a {
+    font-family: SimSun, "宋体", "Songti SC", serif;
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav a:hover { text-decoration: underline; }
+  .nav a.home {
+    font-size: 22px;
+    color: #1a6dff;
+  }
+  .nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav .nav-setting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.34)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.14)));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    cursor: pointer;
+  }
+  .nav .nav-setting img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .nav .nav-setting:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.24)));
+  }
+  .music-widget .nav-music {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 12px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.5)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .nav-music .nm-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2bd6ff, #ff5fa8);
+  }
+  .music-widget .nav-music img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .nav-music:hover {
+    transform: scale(1.06);
+  }
+  .glass-pop {
+    position: absolute;
+    top: 66px;
+    right: 16px;
+    width: 320px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.78)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.46)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.24)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 999;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+  }
+  .glass-pop[hidden] { display: none; }
+  /* 音乐播放器独立浮动组件：默认固定于页面左下角，可鼠标拖动（刷新回默认位） */
+  .music-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.80)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.22)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 998;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+  }
+  .music-widget .mw-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .music-widget .mw-playbtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 8px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.45)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .mw-playbtn[hidden] { display: none; }
+  .music-widget .mw-playbtn img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .mw-playbtn:hover {
+    transform: scale(1.08);
+  }
+  .music-widget .mw-now {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.8);
+    min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* 播放旋转：内芯持续旋转，播放时 running / 暂停时 paused（保持角度，平滑过渡） */
+  @keyframes mw-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .music-widget .nav-music .nm-inner {
+    animation: mw-spin 2.4s linear infinite;
+    animation-play-state: paused;
+  }
+  .music-widget .nav-music.mw-playing .nm-inner {
+    animation-play-state: running;
+  }
+  .mw-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mw-time {
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.75);
+    min-width: 34px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  #musicSeek {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff5fa8, #2bd6ff);
+    outline: none;
+    cursor: pointer;
+  }
+  #musicSeek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
+  }
+  #musicSeek::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    cursor: pointer;
+  }
+  .mw-list {
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .music-widget .mw-list[hidden] { display: none; }
+  .mw-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.6);
+  }
+  .gp-head {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .gp-row {
+    margin-bottom: 12px;
+  }
+  .gp-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .gp-row input[type="range"] {
+    width: 100%;
+    accent-color: #1a6dff;
+    vertical-align: middle;
+  }
+  .gp-val {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 40px;
+  }
+  .gp-bglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .bg-opt {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    color: #ffffff;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-opt:hover {
+    background: linear-gradient(135deg, rgba(138, 92, 255, 0.9), rgba(138, 92, 255, 0.4));
+  }
+  .bg-opt.active {
+    border-color: rgba(255, 255, 255, calc(var(--glass-alpha) * 0.95));
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.5));
+    box-shadow: 0 0 14px rgba(138, 92, 255, calc(var(--glass-alpha) * 0.7)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+  }
+  .gp-empty {
+    font-size: 13px;
+    color: rgba(17, 17, 17, 0.7);
+    padding: 4px 2px;
+  }
+  .gp-note {
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.65);
+  }
+  /* 全站自定义光标：m-1 默认箭头（text 目录本地资源，零外链） */
+  body {
+    cursor: url('/text/m-1.png') 0 0, auto;
+  }
+  /* m-2 手型：所有可点击元素（含各页面 .dl-btn/.plot-btn/.seg-btn/tr.row/棋盘等） */
+  a, button, .bg-opt, .nav-setting, .dl-btn, .plot-btn, .seg-btn, tr.row,
+  .board-area canvas, [role="button"], [onclick], select, summary, label,
+  input[type="submit"], input[type="radio"], input[type="checkbox"], input[type="file"] {
+    cursor: url('/text/m-2.png') 0 0, pointer !important;
+  }
+  /* 全站液态玻璃滚动条：轨道玻璃半透明、滑块粉色 100% -> 30% 渐变、圆角+内高光，hover 加深 */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.12)));
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 1), rgba(255, 105, 180, 0.3));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 0.95), rgba(255, 105, 180, 0.5));
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+
+body{font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;min-height:100vh;color:#e2e8f0;user-select:none;background-color:#0f172a;}
+.glass{background:rgba(15,23,42,calc(var(--glass-alpha, .85) * .72));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.12);border-radius:16px;}
+.ab-wrap{max-width:1020px;margin:0 auto;padding:12px 10px 30px;}
+.ab-top{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;padding:8px 14px;margin-bottom:10px;font-size:13px;}
+.ab-top b{color:#f8fafc;font-variant-numeric:tabular-nums;}
+.layer{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,.78);z-index:40;border-radius:16px;}
+.layer.hidden{display:none;}
+.box{max-width:520px;width:90%;padding:24px 26px;text-align:center;}
+.box h2{font-size:22px;margin-bottom:8px;}
+.box p{color:#94a3b8;font-size:14px;line-height:1.7;margin:6px 0;}
+.ab-btn{display:inline-block;margin:8px 6px;padding:11px 28px;border:0;border-radius:10px;cursor:pointer;font-size:15px;color:#fff;background:rgba(56,189,248,.9);transition:filter .15s;}
+.ab-btn:hover{filter:brightness(1.12);}
+.ab-btn.green{background:rgba(74,222,128,.88);}
+.ab-btn.red{background:rgba(248,113,113,.88);}
+.ab-btn.ghost{background:rgba(148,163,184,.3);}
+.pick-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+.pick-box{width:150px;text-align:center;padding:12px 10px;cursor:pointer;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);transition:transform .12s;}
+.pick-box:hover{transform:translateY(-4px);border-color:rgba(56,189,248,.7);}
+.pick-box img{width:48px;height:48px;object-fit:cover;border-radius:8px;margin-bottom:6px;}
+.pick-box .pn{font-size:15px;font-weight:700;}
+.pick-box .pd{font-size:12px;color:#94a3b8;line-height:1.5;margin-top:4px;}
+.game-box{position:relative;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.12);}
+canvas{display:block;width:100%;height:auto;background:#0b1220;}
+.hud{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;background:rgba(2,6,23,.55);font-size:12px;z-index:30;color:#cbd5e1;}
+.hud b{color:#f8fafc;}
+.hud .bar{height:12px;background:rgba(255,255,255,.1);border-radius:6px;overflow:hidden;width:120px;}
+.hud .bar > div{height:100%;background:linear-gradient(90deg,#f87171,#fb923c);}
+.hud img{width:20px;height:20px;object-fit:cover;border-radius:4px;vertical-align:middle;}
+.skill-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(2,6,23,.6);border-radius:8px;padding:4px 12px;font-size:12px;color:#94a3b8;z-index:30;white-space:nowrap;}
+#pageBg{position:fixed;inset:0;background:url("/pictures/starlight-idol-celebration-2160.jpg") center/cover no-repeat;z-index:-2;}
+.hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div id="pageBg"></div>
+  <nav class="nav">
+    <a class="home" href="/">主页</a>
+    <a href="/download">下载中心</a>
+    <a href="/games.html">小游戏中心</a>
+    <div class="nav-actions">
+      <button type="button" class="nav-setting" id="navSettingBtn" title="设置">
+        <img src="/text/setting.png" alt="设置">
+      </button>
+    </div>
+  </nav>
+  <div class="music-widget" id="musicWidget" title="可拖动，刷新回到默认位置">
+    <div class="mw-head">
+      <button type="button" class="nav-music" id="navMusicBtn" title="展开/收起曲目列表" aria-label="音乐播放器">
+        <span class="nm-inner"><img src="/text/music.png" alt="音乐"></span>
+      </button>
+      <div class="mw-now" id="musicNow">未播放</div>
+      <button type="button" class="mw-playbtn" id="musicPlayBtn" title="播放/暂停" aria-label="播放/暂停" hidden>
+        <img id="musicPlayImg" src="/text/play.png" alt="播放/暂停">
+      </button>
+    </div>
+    <div class="mw-progress">
+      <span class="mw-time" id="musicCur">0:00</span>
+      <input type="range" id="musicSeek" min="0" max="1000" value="0" step="1" aria-label="播放进度">
+      <span class="mw-time" id="musicDur">0:00</span>
+    </div>
+    <div class="gp-bglist mw-list" id="musicList" hidden>
+      <button type="button" class="bg-opt music-opt" data-mp3="/music/Shape%20of%20You.mp3">Shape of You.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E6%88%91%E6%9C%AC%E5%B0%86%E5%BF%83%E5%90%91%E6%98%8E%E6%9C%88.mp3">我本将心向明月.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%80%81%E7%94%B7%E5%AD%A9.mp3">老男孩.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%99%9E%E5%85%AE%E5%8F%B9.mp3">虞兮叹.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%9B%A8%E7%88%B1.mp3">雨爱.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%B8%B3%E9%B8%AF%E6%88%8F.mp3">鸳鸯戏.mp3</button>
+    </div>
+    <div class="mw-note">点击曲目播放，再次点击同一曲目暂停/继续；拖动进度条可跳转</div>
+  </div>
+  <div class="glass-pop" id="glassPop" hidden>
+    <div class="gp-head">站点设置</div>
+    <div class="gp-row">
+      <span class="gp-label">亮度</span>
+      <input type="range" id="glassAlpha" min="25" max="100" value="100" step="1">
+      <span class="gp-val" id="glassAlphaVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">不透明度</span>
+      <input type="range" id="glassOpacity" min="0" max="100" value="100" step="1">
+      <span class="gp-val" id="glassOpacityVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">背景图片（C:\Thome\Pictures）</span>
+      <div class="gp-bglist" id="bgList">
+        <button type="button" class="bg-opt" data-bg="/pictures/fragmented-pink-haired-pilot-2160.png">fragmented-pink-haired-pilot-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/holiday-morning-glow-2160.png">holiday-morning-glow-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-grid-descent-2160.png">neon-grid-descent-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-tower-runner-2160.png">neon-tower-runner-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pastel-dessert-table-2160.png">pastel-dessert-table-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pink-haired-girl-and-plushies-2160.jpg">pink-haired-girl-and-plushies-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-idol-celebration-2160.jpg">starlight-idol-celebration-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-reverie-2160.jpg">starlight-reverie-2160.jpg</button>
+      </div>
+    </div>
+    <div class="gp-note">改动实时生效，自动保存在本机浏览器</div>
+  </div>
+  <script>
+  (function () {
+    var pop = document.getElementById('glassPop');
+    var btn = document.getElementById('navSettingBtn');
+    var alpha = document.getElementById('glassAlpha');
+    var alphaVal = document.getElementById('glassAlphaVal');
+    var opacity = document.getElementById('glassOpacity');
+    var opacityVal = document.getElementById('glassOpacityVal');
+    var bgList = document.getElementById('bgList');
+    var musicBtn = document.getElementById('navMusicBtn');
+    var musicWidget = document.getElementById('musicWidget');
+    var musicList = document.getElementById('musicList');
+    var musicNow = document.getElementById('musicNow');
+    var musicSeek = document.getElementById('musicSeek');
+    var musicCur = document.getElementById('musicCur');
+    var musicDur = document.getElementById('musicDur');
+    var musicPlayBtn = document.getElementById('musicPlayBtn');
+    var musicPlayImg = document.getElementById('musicPlayImg');
+    var audio = null;
+    var currentMp3 = '';
+    var currentLabel = '';
+    var KEY_ALPHA = 'thome-glass-alpha';
+    var KEY_OPACITY = 'thome-glass-opacity';
+    var KEY_BG = 'thome-bg';
+
+    function setVar(name, v) {
+      document.documentElement.style.setProperty(name, String(v));
+    }
+    function applyAlpha(v) {
+      setVar('--glass-alpha', v / 100);
+      try { localStorage.setItem(KEY_ALPHA, String(v)); } catch (e) {}
+    }
+    function applyOpacity(v) {
+      setVar('--glass-opacity', v / 100);
+      try { localStorage.setItem(KEY_OPACITY, String(v)); } catch (e) {}
+    }
+    alpha.addEventListener('input', function () {
+      alphaVal.textContent = alpha.value + '%';
+      applyAlpha(alpha.value);
+    });
+    opacity.addEventListener('input', function () {
+      opacityVal.textContent = opacity.value + '%';
+      applyOpacity(opacity.value);
+    });
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      pop.hidden = !pop.hidden;
+    });
+    musicBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      musicList.hidden = !musicList.hidden;
+    });
+    document.addEventListener('click', function (e) {
+      if (!pop.hidden && !(pop.contains(e.target) || btn.contains(e.target))) {
+        pop.hidden = true;
+      }
+      if (!musicList.hidden && !musicWidget.contains(e.target)) {
+        musicList.hidden = true;
+      }
+    });
+    function applyBg(url) {
+      if (url) {
+        document.body.style.backgroundImage = 'url("' + url + '")';
+      } else {
+        document.body.style.backgroundImage = '';
+      }
+    }
+    function markActive(url) {
+      var opts = bgList.querySelectorAll('.bg-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-bg') === url);
+      }
+    }
+    bgList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== bgList && !(t.getAttribute && t.getAttribute('data-bg'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-bg') : null;
+      if (!url) return;
+      applyBg(url);
+      try { localStorage.setItem(KEY_BG, url); } catch (e) {}
+      markActive(url);
+    });
+    function setMusicNow(text) {
+      musicNow.textContent = text;
+    }
+    function markMusicActive(url) {
+      var opts = musicList.querySelectorAll('.music-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-mp3') === url);
+      }
+    }
+    function stopAudio() {
+      if (audio) {
+        audio.pause();
+        audio = null;
+      }
+      currentMp3 = '';
+      currentLabel = '';
+      musicBtn.classList.remove('mw-playing');
+      musicSeek.value = 0;
+      musicCur.textContent = '0:00';
+      musicDur.textContent = '0:00';
+      syncPlayBtn();
+    }
+    /* 播放控制按钮图标联动：有曲目时显示，播放=stop 样式，暂停=play 样式 */
+    function syncPlayBtn() {
+      if (audio && currentMp3) {
+        musicPlayBtn.hidden = false;
+        musicPlayImg.src = audio.paused ? '/text/play.png' : '/text/stop.png';
+      } else {
+        musicPlayBtn.hidden = true;
+      }
+    }
+    musicPlayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!audio || !currentMp3) return;
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('mw-playing');
+        setMusicNow('正在播放：' + currentLabel);
+        syncPlayBtn();
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('mw-playing');
+        setMusicNow('已暂停：' + currentLabel);
+        syncPlayBtn();
+      }
+    });
+    function fmtTime(t) {
+      t = Math.floor(t || 0);
+      var m = Math.floor(t / 60);
+      var s = t % 60;
+      return m + ':' + (s < 10 ? '0' + s : '' + s);
+    }
+    function updateProgress() {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        musicSeek.value = Math.round(audio.currentTime / audio.duration * 1000);
+        musicCur.textContent = fmtTime(audio.currentTime);
+        musicDur.textContent = fmtTime(audio.duration);
+      }
+    }
+    musicList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== musicList && !(t.getAttribute && t.getAttribute('data-mp3'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-mp3') : null;
+      var label = t && t.textContent ? t.textContent : url;
+      if (!url) return;
+      if (currentMp3 === url) {
+        if (audio && !audio.paused) {
+          audio.pause();
+          musicBtn.classList.remove('mw-playing');
+          setMusicNow('已暂停：' + label);
+          syncPlayBtn();
+        } else if (audio) {
+          audio.play();
+          musicBtn.classList.add('mw-playing');
+          setMusicNow('正在播放：' + label);
+          syncPlayBtn();
+        }
+        return;
+      }
+      stopAudio();
+      currentMp3 = url;
+      currentLabel = label;
+      audio = new Audio(url);
+      audio.addEventListener('loadedmetadata', updateProgress);
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', function () {
+        musicBtn.classList.remove('mw-playing');
+        currentMp3 = '';
+        currentLabel = '';
+        setMusicNow('播放结束：' + label);
+        markMusicActive('');
+        syncPlayBtn();
+      });
+      audio.play();
+      musicBtn.classList.add('mw-playing');
+      setMusicNow('正在播放：' + label);
+      markMusicActive(url);
+      syncPlayBtn();
+    });
+    /* 进度条拖动 seek：拖动不中断音频流 */
+    musicSeek.addEventListener('input', function () {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = audio.duration * musicSeek.value / 1000;
+        musicCur.textContent = fmtTime(audio.currentTime);
+      }
+    });
+    /* 组件拖动：mousedown/mousemove/mouseup，限制在视口内，避开按钮与进度条 */
+    var mwDrag = null;
+    musicWidget.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      e.preventDefault();
+      var rect = musicWidget.getBoundingClientRect();
+      musicWidget.style.left = rect.left + 'px';
+      musicWidget.style.top = rect.top + 'px';
+      musicWidget.style.bottom = 'auto';
+      musicWidget.style.right = 'auto';
+      mwDrag = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!mwDrag) return;
+      var x = e.clientX - mwDrag.dx;
+      var y = e.clientY - mwDrag.dy;
+      x = Math.max(0, Math.min(x, window.innerWidth - musicWidget.offsetWidth));
+      y = Math.max(0, Math.min(y, window.innerHeight - musicWidget.offsetHeight));
+      musicWidget.style.left = x + 'px';
+      musicWidget.style.top = y + 'px';
+    });
+    document.addEventListener('mouseup', function () {
+      mwDrag = null;
+    });
+    /* 页面加载时恢复已保存设置 */
+    try {
+      var a = localStorage.getItem(KEY_ALPHA);
+      if (a !== null) {
+        alpha.value = a;
+        alphaVal.textContent = a + '%';
+        setVar('--glass-alpha', Number(a) / 100);
+      }
+      var o = localStorage.getItem(KEY_OPACITY);
+      if (o !== null) {
+        opacity.value = o;
+        opacityVal.textContent = o + '%';
+        setVar('--glass-opacity', Number(o) / 100);
+      }
+      var b = localStorage.getItem(KEY_BG);
+      if (b) {
+        var url = b;
+        try {
+          var obj = JSON.parse(b);
+          if (obj && obj.type === 'upload' && obj.data) url = obj.data;
+        } catch (e) {}
+        if (url) {
+          applyBg(url);
+          markActive(url);
+        }
+      }
+    } catch (e) {}
+    syncPlayBtn();
+  })();
+  </script>
+
+<div class="ab-wrap">
+  <div class="ab-top glass" id="abTop"></div>
+  <div class="game-box">
+    <canvas id="abCan" width="960" height="600"></canvas>
+    <div class="hud" id="abHud"></div>
+    <div class="skill-hint" id="abHint">WASD/方向键移动 · 鼠标左键攻击 · 空格冲刺 · Q 爆发 · E 护盾</div>
+
+    <div class="layer" id="menuLayer">
+      <div class="box glass">
+        <h2>🌀 暗渊回廊</h2>
+        <p>俯视角动作 Roguelike · 房间制清怪</p>
+        <p>挑战模式：每关 8 小结，同关难度一致，通关升档<br>无尽模式：每过 1 小结难度 +0.1，直至倒下</p>
+        <div id="bestBox"></div>
+        <div>
+          <button class="ab-btn" id="btnChallenge">挑战模式</button>
+          <button class="ab-btn green" id="btnEndless">无尽模式</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="layer hidden" id="pickLayer">
+      <div class="box glass">
+        <h2 id="pickTitle">选择强化</h2>
+        <p id="pickDesc"></p>
+        <div class="pick-grid" id="pickGrid"></div>
+      </div>
+    </div>
+
+    <div class="layer hidden" id="restLayer">
+      <div class="box glass">
+        <h2>🔥 休整房</h2>
+        <p>用金币与材料强化装备，再战更深回廊。</p>
+        <div id="restGrid" class="pick-grid"></div>
+      </div>
+    </div>
+
+    <div class="layer hidden" id="overLayer">
+      <div class="box glass">
+        <h2>💀 你倒下了</h2>
+        <p id="overMsg"></p>
+        <div><button class="ab-btn" id="btnRetry">重新开始</button><button class="ab-btn ghost" id="btnMenu">返回主菜单</button></div>
+      </div>
+    </div>
+
+    <div class="layer hidden" id="clearLayer">
+      <div class="box glass">
+        <h2>✅ 房间已清空</h2>
+        <p id="clearMsg"></p>
+        <div><button class="ab-btn" id="btnNext">前往下一小结</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var LS='thome-abyss-';
+var ctx=document.getElementById('abCan').getContext('2d');
+var CW=960,CH=600;
+var P={},MODE='',stage=1,sec=0,diff=1,keys={},mouse={x:0,y:0,down:false},atkAngle=0,last=0,state='menu',traits=[],skills=[],dashT=0,boomT=0,shieldT=0,charges=[],bullets=[],drops=[],rEnemies=[],roomClosed=false,roomClear=false,nextSec=0,flash=0;
+var bestStage=parseInt(localStorage.getItem(LS+'best-stage')||'0',10)||0;
+var bestSec=parseInt(localStorage.getItem(LS+'best-sec')||'0',10)||0;
+var bestDiff=parseFloat(localStorage.getItem(LS+'best-diff')||'0')||0;
+function $(id){return document.getElementById(id);}
+function icon(n){return '/text/'+encodeURIComponent('技能')+'/'+encodeURIComponent(n);}
+function ph(){return icon('ability_placeholder.png');}
+function drawImg(id,src,onerr){var w=document.createElement('img');w.src=src;w.onerror=function(){this.src=ph();};return w;}
+
+var TRAITS=[
+ {n:'生命之核',i:'effect_health.png',d:'最大生命 +25，回复 25 生命',f:function(){P.maxHp+=25;P.hp=Math.min(P.maxHp,P.hp+25);}},
+ {n:'狂战士',i:'special_attack.png',d:'攻击 +4',f:function(){P.atk+=4;}},
+ {n:'铁壁',i:'effect_protector.png',d:'防御 +3',f:function(){P.def+=3;}},
+ {n:'疾风',i:'effect_speedup.png',d:'移速 +18%',f:function(){P.speed*=1.18;}},
+ {n:'致命',i:'scp_076_combo.png',d:'暴击率 +10%',f:function(){P.crit+=0.10;}},
+ {n:'血怒',i:'scp_542_blood.png',d:'攻击伤害 6% 吸血',f:function(){P.lifesteal=(P.lifesteal||0)+0.06;}},
+ {n:'元素师',i:'flame_walker.png',d:'攻速 +20%（攻击冷却缩短）',f:function(){P.cd*=0.8;}}
+];
+var SKILLS=[
+ {n:'冲刺',kind:'active',key:'空格',i:'sprint.png',d:'向移动方向突进并伤害路径敌人'},
+ {n:'爆发',kind:'active',key:'Q',i:'638_aoe_scream.png',d:'以自身为中心造成范围伤害'},
+ {n:'护盾',kind:'active',key:'E',i:'special_shield.png',d:'获得 25 点护盾吸收伤害'},
+ {n:'多重攻击',kind:'passive',i:'scp_076_combo.png',d:'攻击额外波及 1 名敌人'},
+ {n:'弹射',kind:'passive',i:'shuriken.png',d:'命中时 30% 波及相邻敌人'},
+ {n:'减速光环',kind:'passive',i:'effect_slower.png',d:'附近敌人移速 -30%'},
+ {n:'连锁闪电',kind:'passive',i:'uiu_thunder.png',d:'10% 对另一敌人造成 60% 伤害'},
+ {n:'吸血',kind:'passive',i:'scp_939_blood.png',d:'伤害 8% 转化为生命'}
+];
+function hasSkill(n){for(var i=0;i<skills.length;i++)if(skills[i].n===n)return true;return false;}
+function hasTrait(n){for(var i=0;i<traits.length;i++)if(traits[i].n===n)return true;return false;}
+function randN(arr,exclude){var picks=[];var seen={};for(var i=0;i<arr.length;i++){if(exclude&&seen[arr[i].n])continue;seen[arr[i].n]=1;}var pool=[];for(var j=0;j<arr.length;j++){if(!(exclude&&exclude(arr[j].n)))pool.push(arr[j]);}shuffle(pool);return pool.slice(0,3);}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function newRun(mode){
+ MODE=mode;stage=1;sec=0;diff=1.0;
+ P={x:CW/2,y:CH-70,r:15,maxHp:100,hp:100,atk:10,def:5,speed:190,crit:0.05,cd:0.45,atkCd:0,inv:0,shield:0,lifesteal:0,weaponLv:0,armorLv:0,gold:0,mat:0};
+ traits=[];skills=[];dashT=0;boomT=0;shieldT=0;state='game';
+ $('menuLayer').classList.add('hidden');
+ $('clearLayer').classList.add('hidden');
+ $('pickLayer').classList.add('hidden');
+ $('restLayer').classList.add('hidden');
+ $('overLayer').classList.add('hidden');
+ startRoom();
+}
+function roomType(){
+ if(MODE==='challenge'){
+  if(sec%8===0)return 'boss';
+  if(sec%8===4)return 'rest';
+  return 'normal';
+ }
+ if(sec%8===0)return 'boss';
+ if(sec%5===0)return 'rest';
+ return 'normal';
+}
+function startRoom(){
+ if(MODE==='challenge'&&sec>0&&sec%8===0){stage++;diff=1+(stage-1)*0.5;sec=0;}
+ sec++;
+ if(MODE==='endless'&&sec>1)diff=Math.round((diff+0.1)*100)/100;
+ roomClosed=true;roomClear=false;nextSec=0;
+ rEnemies=[];bullets=[];drops=[];charges=[];
+ P.x=CW/2;P.y=CH-70;P.shield=P.shield||0;
+ var t=roomType();
+ if(t==='rest'){roomClosed=false;openRest();}
+ else spawnRoom(t);
+ updateHud();
+}
+function spawnRoom(t){
+ var sc=diff;
+ if(t==='boss')sc=diff*1.35;
+ var nCh=Math.min(6,Math.floor(1+sc*1.6));
+ var nSh=Math.max(0,Math.floor(sc-0.2));
+ var nChg=Math.floor(sc*0.4);
+ if(t==='boss'){nCh=Math.max(4,nCh);nSh=Math.max(2,nSh);nChg=Math.max(2,nChg);}
+ for(var i=0;i<nCh;i++)rEnemies.push(newEnemy('chaser',t));
+ for(var j=0;j<nSh;j++)rEnemies.push(newEnemy('shooter',t));
+ for(var k=0;k<nChg;k++)rEnemies.push(newEnemy('charger',t));
+ shuffle(rEnemies);
+}
+function newEnemy(kind,t){
+ var sc=diff*(t==='boss'?1.35:1);
+ var e={kind:kind,x:60+Math.random()*(CW-120),y:50+Math.random()*(CH-160),r:14,speed:0,hp:0,maxHp:0,atk:0,cd:0,cdT:0,angle:0,charge:0,chargeT:0,state:'idle',hitT:0};
+ if(kind==='chaser'){e.hp=e.maxHp=Math.round(26*sc);e.atk=Math.round(7*sc);e.speed=105;}
+ else if(kind==='shooter'){e.hp=e.maxHp=Math.round(20*sc);e.atk=Math.round(9*sc);e.speed=70;e.cd=1.6;}
+ else{e.hp=e.maxHp=Math.round(34*sc);e.atk=Math.round(12*sc);e.speed=60;e.cd=2.6;}
+ return e;
+}
+
+function openRest(){
+ state='rest';
+ var h='<div class="pick-box" data-a="w"><div class="pn">强化武器</div><div class="pd">攻击 +3<br>等级 Lv.'+P.weaponLv+' → Lv.'+(P.weaponLv+1)+'<br><b style="color:#fbbf24">🪙 '+weaponCost()+' · 材料 '+matCost()+'</b></div></div>';
+ h+='<div class="pick-box" data-a="a"><div class="pn">强化护甲</div><div class="pd">防御 +3<br>等级 Lv.'+P.armorLv+' → Lv.'+(P.armorLv+1)+'<br><b style="color:#fbbf24">🪙 '+armorCost()+' · 材料 '+matCost()+'</b></div></div>';
+ h+='<div class="pick-box" data-a="c"><div class="pn">继续前进</div><div class="pd">返回回廊</div></div>';
+ $('restGrid').innerHTML=h;
+ var boxes=document.querySelectorAll('#restGrid .pick-box');
+ for(var i=0;i<boxes.length;i++){
+  boxes[i].addEventListener('click',function(){
+   var a=this.getAttribute('data-a');
+   if(a==='w'){if(P.gold>=weaponCost()&&P.mat>=matCost()){P.gold-=weaponCost();P.mat-=matCost();P.weaponLv++;P.atk+=3;openRest();}}
+   else if(a==='a'){if(P.gold>=armorCost()&&P.mat>=matCost()){P.gold-=armorCost();P.mat-=matCost();P.armorLv++;P.def+=3;openRest();}}
+   else{state='game';$('restLayer').classList.add('hidden');roomClosed=false;roomClear=true;showClear(true);}
+   updateHud();
+  });
+ }
+ $('restLayer').classList.remove('hidden');
+}
+function weaponCost(){return 30+8*P.weaponLv;}
+function armorCost(){return 25+6*P.armorLv;}
+function matCost(){return 1+P.weaponLv;}
+
+function clearRoom(){
+ roomClosed=false;roomClear=true;
+ var g=Math.round(5+diff*4+ (P.weaponLv)*1);P.gold+=g;
+ if(Math.random()<0.4)P.mat+=1;
+ var heal=null;
+ if(Math.random()<0.3&&P.hp<P.maxHp*0.85){heal=Math.round(12+diff*3);P.hp=Math.min(P.maxHp,P.hp+heal);}
+ var msg='获得 🪙 '+g+' 金币'+(P.mat?' · 材料 +1':'');
+ if(heal)msg+=' · 恢复 '+heal+' 生命';
+ var hasReward=false;
+ if(sec%3===0){showPick('skill');hasReward=true;}
+ else if(sec%5===0){showPick('trait');hasReward=true;}
+ else if(roomTypeLast==='boss'){showPick('trait');hasReward=true;}
+ if(!hasReward)showClear(true,msg);
+ else pendingClearMsg=msg;
+}
+var roomTypeLast='normal';
+function showClear(ok,msg){
+ if(ok){$('clearMsg').textContent=msg||'回廊深处的大门缓缓开启。';$('clearLayer').classList.remove('hidden');}
+}
+function continueAfterPick(){var msg=pendingClearMsg||'';pendingClearMsg='';$('clearMsg').textContent=msg; $('clearLayer').classList.remove('hidden');}
+
+var pendingClearMsg='';
+var pickKind='';
+function showPick(kind){
+ pickKind=kind;state='pick';
+ $('pickTitle').textContent=(kind==='trait')?'选择特质（被动天赋）':'选择技能';
+ $('pickDesc').textContent=(kind==='trait')?'特质决定你的流派定位，可叠加。':'技能可叠加形成独特 Build。';
+ var pool=(kind==='trait')?TRAITS:SKILLS;
+ var picks=randN(pool);
+ var h='';
+ for(var i=0;i<3;i++){
+  var p=picks[i];
+  h+='<div class="pick-box" data-i="'+i+'"><img src="'+icon(p.i)+'" onerror="this.src='+ph()+'"><div class="pn">'+p.n+'</div><div class="pd">'+p.d+'</div></div>';
+ }
+ h+='<div class="pick-box" data-i="3" style="border-style:dashed"><div class="pn">跳过</div><div class="pd">不选择</div></div>';
+ $('pickGrid').innerHTML=h;
+ var boxes=document.querySelectorAll('#pickGrid .pick-box');
+ for(var i2=0;i2<boxes.length;i2++){
+  boxes[i2].addEventListener('click',function(){
+   var idx=parseInt(this.getAttribute('data-i'),10);
+   if(idx<3){
+    var p=picks[idx];
+    if(kind==='trait'){traits.push(p);p.f();}
+    else{skills.push(p);}
+   }
+   state='game';$('pickLayer').classList.add('hidden');
+   continueAfterPick();
+  });
+ }
+ $('pickLayer').classList.remove('hidden');
+ updateHud();
+}
+
+function death(){
+ state='over';
+ var m=(MODE==='challenge')?'到达第 <b>'+stage+'</b> 关 · 第 '+sec%8+' 小结':'存活 <b>'+sec+'</b> 小结 · 难度系数 <b>'+diff.toFixed(1)+'</b>';
+ if(MODE==='challenge'){if(stage>bestStage){bestStage=stage;localStorage.setItem(LS+'best-stage',String(stage));}}
+ else{if(sec>bestSec){bestSec=sec;localStorage.setItem(LS+'best-sec',String(sec));localStorage.setItem(LS+'best-diff',String(diff));}}
+ $('overMsg').innerHTML=m+'<br>历史最佳：'+(MODE==='challenge'?'挑战第 '+bestStage+' 关':'无尽 '+bestSec+' 小结 / 难度 '+bestDiff.toFixed(1));
+ $('overLayer').classList.remove('hidden');
+ updateHud();
+}
+
+function dist(a,b){return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));}
+function update(dt){
+ if(state!=='game')return;
+ if(P.inv>0)P.inv-=dt;
+ if(P.atkCd>0)P.atkCd-=dt;
+ if(dashT>0)dashT-=dt;
+ if(boomT>0)boomT-=dt;
+ if(shieldT>0)shieldT-=dt;
+ if(flash>0)flash-=dt;
+ // 移动
+ var dx=(keys['ArrowRight']||keys['d']?1:0)-(keys['ArrowLeft']||keys['a']?1:0);
+ var dy=(keys['ArrowDown']||keys['s']?1:0)-(keys['ArrowUp']||keys['w']?1:0);
+ if(dx||dy){var len=Math.sqrt(dx*dx+dy*dy);dx/=len;dy/=len;}
+ var spd=P.speed*(hasSkill('减速光环')?1:1);
+ P.x+=dx*spd*dt;P.y+=dy*spd*dt;
+ P.x=Math.max(22,Math.min(CW-22,P.x));P.y=Math.max(46,Math.min(CH-22,P.y));
+ // 攻击
+ if(mouse.down&&P.atkCd<=0){
+  P.atkCd=P.cd;atkAngle=Math.atan2(mouse.y-P.y,mouse.x-P.x);
+  var hit1=false;
+  for(var i=rEnemies.length-1;i>=0;i--){
+   var e=rEnemies[i];
+   var ang=Math.atan2(e.y-P.y,e.x-P.x);
+   var dd=dist(P,e);
+   var dAng=Math.abs(angleDiff(ang,atkAngle));
+   if(dd<68&&dAng<0.9){
+    var dmg=Math.round(P.atk+(Math.random()<P.crit?P.atk:0));
+    damageEnemy(i,dmg);
+    hit1=true;
+   }else if(hasSkill('多重攻击')&&dd<110&&dAng<1.6&&hit1){
+    var dmg2=Math.round((P.atk)*0.8);damageEnemy(i,dmg2);
+   }
+  }
+  if(hasSkill('弹射')&&hit1){
+   for(var i2=rEnemies.length-1;i2>=0;i2--){
+    var e2=rEnemies[i2];if(dist(P,e2)<150&&Math.random()<0.3){damageEnemy(i2,Math.round(P.atk*0.7));}
+   }
+  }
+  flash=0.08;
+ }
+ // 技能
+ if(keys[' ']&&dashT<=0&&hasSkill('冲刺')){
+  dashT=2.2;
+  var vx=(dx||(Math.cos(atkAngle))),vy=(dy||(Math.sin(atkAngle)));
+  if(!dx&&!dy){vx=Math.cos(atkAngle);vy=Math.sin(atkAngle);}
+  var len=Math.sqrt(vx*vx+vy*vy);vx/=len;vy/=len;
+  var steps=20;
+  for(var s=0;s<steps;s++){
+   var px=P.x+vx*12*s,py=P.y+vy*12*s;
+   for(var i3=rEnemies.length-1;i3>=0;i3--){
+    if(dist(rEnemies[i3],{x:px,y:py})<30){damageEnemy(i3,Math.round(P.atk*1.5));}
+   }
+  }
+  P.x=Math.max(22,Math.min(CW-22,P.x+vx*120));P.y=Math.max(46,Math.min(CH-22,P.y+vy*120));
+  flash=0.1;
+ }
+ if(keys['q']&&boomT<=0&&hasSkill('爆发')){boomT=4;
+  for(var i4=rEnemies.length-1;i4>=0;i4--){if(dist(P,rEnemies[i4])<95)damageEnemy(i4,Math.round(P.atk*1.8));}
+  flash=0.15;
+ }
+ if(keys['e']&&shieldT<=0&&hasSkill('护盾')){shieldT=6;P.shield+=25;}
+ // 敌人
+ for(var i5=rEnemies.length-1;i5>=0;i5--){
+  var e=rEnemies[i5];
+  e.hitT-=dt;e.cdT-=dt;
+  var spdMul=(hasSkill('减速光环')&&dist(P,e)<160)?0.7:1;
+  if(e.kind==='chaser'){
+   var ang=Math.atan2(P.y-e.y,P.x-e.x);e.x+=Math.cos(ang)*e.speed*spdMul*dt;e.y+=Math.sin(ang)*e.speed*spdMul*dt;
+   if(dist(P,e)<28&&P.inv<=0){hurt(e.atk);P.inv=0.8;}
+  }else if(e.kind==='shooter'){
+   var ang2=Math.atan2(P.y-e.y,P.x-e.x);
+   if(dist(P,e)>230){e.x+=Math.cos(ang2)*e.speed*spdMul*dt;e.y+=Math.sin(ang2)*e.speed*spdMul*dt;}
+   else if(dist(P,e)<170){e.x-=Math.cos(ang2)*e.speed*spdMul*dt;e.y-=Math.sin(ang2)*e.speed*spdMul*dt;}
+   if(e.cdT<=0){e.cdT=e.cd;bullets.push({x:e.x,y:e.y,ang:ang2,speed:230,r:6,atk:e.atk});}
+  }else if(e.kind==='charger'){
+   if(e.state==='idle'){
+    e.chargeT+=dt;
+    if(e.chargeT>=e.cd){e.state='windup';e.chargeT=0;}
+   }else if(e.state==='windup'){
+    e.chargeT+=dt;
+    if(e.chargeT>=0.5){e.state='charge';e.chargeT=0;e.angle=Math.atan2(P.y-e.y,P.x-e.x);}
+   }else if(e.state==='charge'){
+    e.x+=Math.cos(e.angle)*430*spdMul*dt;e.y+=Math.sin(e.angle)*430*spdMul*dt;
+    e.chargeT+=dt;
+    if(e.chargeT>=0.7){e.state='idle';e.chargeT=0;}
+    if(dist(P,e)<30&&P.inv<=0){hurt(e.atk);P.inv=0.8;}
+   }
+  }
+  e.x=Math.max(22,Math.min(CW-22,e.x));e.y=Math.max(46,Math.min(CH-22,e.y));
+ }
+ // 子弹
+ for(var i6=bullets.length-1;i6>=0;i6--){
+  var b=bullets[i6];b.x+=Math.cos(b.ang)*b.speed*dt;b.y+=Math.sin(b.ang)*b.speed*dt;
+  if(b.x<0||b.x>CW||b.y<0||b.y>CH){bullets.splice(i6,1);continue;}
+  if(dist(P,b)<b.r+14&&P.inv<=0){hurt(b.atk);P.inv=0.7;bullets.splice(i6,1);}
+ }
+ // 掉落
+ for(var i7=drops.length-1;i7>=0;i7--){
+  var d=drops[i7];
+  if(dist(P,d)<24){if(d.k==='g'){P.gold+=d.v;}else if(d.k==='m'){P.mat+=d.v;}else{P.hp=Math.min(P.maxHp,P.hp+d.v);}
+   drops.splice(i7,1);updateHud();}
+ }
+ // 清房判定
+ if(roomClosed&&rEnemies.length===0){
+  roomTypeLast=(MODE==='challenge')?(sec%8===0?'boss':'normal'):(sec%8===0?'boss':'normal');
+  clearRoom();
+ }
+ updateHud();
+}
+function angleDiff(a,b){var d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d;}
+function damageEnemy(i,dmg){
+ var e=rEnemies[i];e.hp-=dmg;e.hitT=0.12;
+ if(P.lifesteal)P.hp=Math.min(P.maxHp,P.hp+Math.max(1,Math.round(dmg*P.lifesteal)));
+ if(hasSkill('连锁闪电')&&Math.random()<0.1){
+  var best=-1,bd=999;
+  for(var j=0;j<rEnemies.length;j++){if(j!==i&&dist(e,rEnemies[j])<220&&dist(e,rEnemies[j])<bd){bd=dist(e,rEnemies[j]);best=j;}}
+  if(best>=0)rEnemies[best].hp-=Math.round(dmg*0.6);
+ }
+ if(e.hp<=0){
+  var g=Math.max(2,Math.round(3+diff*2.5));drops.push({k:'g',v:g,x:e.x,y:e.y});
+  if(Math.random()<0.3)drops.push({k:'m',v:1,x:e.x+8,y:e.y+8});
+  if(Math.random()<0.25)drops.push({k:'h',v:Math.round(10+diff*2),x:e.x-8,y:e.y-8});
+  rEnemies.splice(i,1);
+ }
+}
+function hurt(v){
+ var d=Math.max(1,v-P.def);
+ if(P.shield>0){var ab=Math.min(P.shield,d);P.shield-=ab;d-=ab;}
+ P.hp-=d;
+ if(P.hp<=0){P.hp=0;death();}
+}
+function draw(){
+ ctx.clearRect(0,0,CW,CH);
+ // 地板
+ ctx.fillStyle='#101827';ctx.fillRect(0,0,CW,CH);
+ ctx.strokeStyle='rgba(255,255,255,.08)';
+ for(var x=32;x<CW;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,CH);ctx.stroke();}
+ for(var y=32;y<CH;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y);ctx.stroke();}
+ ctx.strokeStyle='rgba(148,163,184,.35)';ctx.lineWidth=3;ctx.strokeRect(4,34,CW-8,CH-38);
+ // 门
+ if(roomClosed&&rEnemies.length>0){ctx.fillStyle='rgba(248,113,113,.8)';ctx.fillRect(CW/2-26,2,52,6);}
+ if(roomClear){ctx.fillStyle='rgba(74,222,128,.85)';ctx.fillRect(CW/2-26,CH-8,52,6);}
+ // 掉落
+ for(var i=0;i<drops.length;i++){var d=drops[i];
+  if(d.k==='g'){ctx.fillStyle='#fbbf24';ctx.beginPath();ctx.arc(d.x,d.y,5,0,Math.PI*2);ctx.fill();}
+  else if(d.k==='m'){ctx.fillStyle='#a78bfa';ctx.beginPath();ctx.arc(d.x,d.y,5,0,Math.PI*2);ctx.fill();}
+  else{ctx.fillStyle='#4ade80';ctx.fillRect(d.x-5,d.y-5,10,10);}
+ }
+ // 敌人
+ for(var j=0;j<rEnemies.length;j++){
+  var e=rEnemies[j];
+  var col=e.kind==='chaser'?'#ef4444':(e.kind==='shooter'?'#8b5cf6':'#f97316');
+  ctx.fillStyle=e.hitT>0?'#ffffff':col;
+  ctx.beginPath();ctx.arc(e.x,e.y,e.r,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(e.x-e.r,e.y-e.r-8,2*e.r,4);
+  ctx.fillStyle='#4ade80';ctx.fillRect(e.x-e.r,e.y-e.r-8,2*e.r*Math.max(0,e.hp/e.maxHp),4);
+  if(e.kind==='shooter'&&e.cdT>0){var p=1-e.cdT/e.cd;ctx.fillStyle='#c084fc';ctx.fillRect(e.x-e.r,e.y+4,2*e.r*p,3);}
+  if(e.kind==='charger'&&e.state==='windup'){ctx.fillStyle='#fbbf24';ctx.beginPath();ctx.arc(e.x,e.y,e.r+4,0,Math.PI*2);ctx.stroke();}
+ }
+ // 子弹
+ ctx.fillStyle='#e879f9';
+ for(var k=0;k<bullets.length;k++){ctx.beginPath();ctx.arc(bullets[k].x,bullets[k].y,bullets[k].r,0,Math.PI*2);ctx.fill();}
+ // 玩家
+ if(state==='game'){
+  ctx.fillStyle='#22d3ee';
+  if(P.inv>0&&Math.floor(P.inv*10)%2===0)ctx.fillStyle='rgba(34,211,238,.45)';
+  ctx.beginPath();ctx.arc(P.x,P.y,15,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=2;ctx.stroke();
+  // 攻击方向弧
+  if(flash>0){ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,66,atkAngle-0.5,atkAngle+0.5);ctx.stroke();}
+  if(P.shield>0){ctx.strokeStyle='rgba(56,189,248,.9)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,22,0,Math.PI*2);ctx.stroke();}
+  if(dashT>0&&dashT>2.0){ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,28,0,Math.PI*2);ctx.stroke();}
+ }
+}
+function updateHud(){
+ var top='';
+ if(MODE==='challenge')top+='<span>模式 <b>挑战</b></span><span>第 <b>'+stage+'</b> 关</span><span>小结 <b>'+((sec%8)||8)+'</b>/8</span><span>难度 <b>'+diff.toFixed(1)+'</b></span>';
+ else top+='<span>模式 <b>无尽</b></span><span>小结 <b>'+sec+'</b></span><span>难度 <b>'+diff.toFixed(1)+'</b></span>';
+ top+='<span class="bar"><div style="width:'+Math.max(0,P.hp/P.maxHp*100)+'%"></div></span><span><b>'+Math.max(0,P.hp)+'</b>/'+P.maxHp+(P.shield>0?' · 护盾 '+P.shield:'')+'</span>';
+ top+='<span>🪙 <b>'+P.gold+'</b></span><span>◆ <b>'+P.mat+'</b></span>';
+ top+='<span>⚔️ Lv'+P.weaponLv+'</span><span>🛡️ Lv'+P.armorLv+'</span>';
+ var icons='';
+ for(var i=0;i<traits.length;i++)icons+='<img src="'+icon(traits[i].i)+'" onerror="this.src='+ph()+'" title="特质：'+traits[i].n+'">';
+ for(var j=0;j<skills.length;j++)icons+='<img src="'+icon(skills[j].i)+'" onerror="this.src='+ph()+'" title="技能：'+skills[j].n+(skills[j].key?' ('+skills[j].key+')':'')+'">';
+ top+=icons;
+ $('abHud').innerHTML=top;
+ $('abTop').innerHTML='<span>🏆 挑战最佳：第 <b>'+bestStage+'</b> 关</span><span>· 无尽最佳：<b>'+bestSec+'</b> 小结 / 难度 <b>'+bestDiff.toFixed(1)+'</b></span>';
+}
+
+// 事件
+$('btnChallenge').addEventListener('click',function(){newRun('challenge');});
+$('btnEndless').addEventListener('click',function(){newRun('endless');});
+$('btnRetry').addEventListener('click',function(){newRun(MODE);});
+$('btnMenu').addEventListener('click',function(){state='menu';$('overLayer').classList.add('hidden');$('menuLayer').classList.remove('hidden');updateHud();});
+$('btnNext').addEventListener('click',function(){$('clearLayer').classList.add('hidden');startRoom();});
+window.addEventListener('keydown',function(e){
+ if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].indexOf(e.key)>-1)e.preventDefault();
+ keys[e.key]=true;
+ if(e.key===' '&&state==='game')e.preventDefault();
+});
+window.addEventListener('keyup',function(e){keys[e.key]=false;});
+var can=$('abCan');
+can.addEventListener('mousemove',function(e){
+ var r=can.getBoundingClientRect();mouse.x=(e.clientX-r.left)*(CW/r.width);mouse.y=(e.clientY-r.top)*(CH/r.height);
+});
+can.addEventListener('mousedown',function(e){if(e.button===0){mouse.down=true;var r=can.getBoundingClientRect();mouse.x=(e.clientX-r.left)*(CW/r.width);mouse.y=(e.clientY-r.top)*(CH/r.height);}});
+window.addEventListener('mouseup',function(e){if(e.button===0)mouse.down=false;});
+function loop(t){
+ var dt=Math.min(0.05,(t-last)/1000||0.016);last=t;
+ update(dt);draw();
+ requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+updateHud();
+})();
+</script>
+</body>
+</html>

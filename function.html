@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>函数可视化</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    /* 函数可视化是整屏应用：页面本身不滚动，避免拖动网格时带走整页 */
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+    color: #e7e7ef;
+    background-color: #0f0f16;
+    background-image: url("/pictures/starlight-idol-celebration-2160.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 9, 14, calc(var(--glass-alpha) * 0.64));
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* 全站液态玻璃统一变量（设置面板滑块实时驱动） */
+  :root {
+    --glass-alpha: 1; /* 亮度：玻璃底色浓淡乘数 0.25~1，作用与历史版本一致 */
+    --glass-opacity: 1; /* 不透明度：0~1。0 时玻璃背景/模糊/边框完全透明可透过后方图片，1 时与默认一致 */
+  }
+  /* 顶部跳转栏 */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    height: 58px;
+    padding: 0 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.62)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.16)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    position: relative;
+    z-index: 10;
+  }
+  .nav a {
+    font-family: SimSun, "宋体", "Songti SC", serif;
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav a:hover { text-decoration: underline; }
+  .nav a.home {
+    font-size: 22px;
+    color: #1a6dff;
+  }
+  .nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav .nav-setting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.34)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.14)));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    cursor: pointer;
+  }
+  .nav .nav-setting img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .nav .nav-setting:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.24)));
+  }
+  .music-widget .nav-music {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 12px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.5)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .nav-music .nm-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2bd6ff, #ff5fa8);
+  }
+  .music-widget .nav-music img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .nav-music:hover {
+    transform: scale(1.06);
+  }
+  .glass-pop {
+    position: absolute;
+    top: 66px;
+    right: 16px;
+    width: 320px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.78)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.46)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.24)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 999;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+  }
+  .glass-pop[hidden] { display: none; }
+  /* 音乐播放器独立浮动组件：默认固定于页面左下角，可鼠标拖动（刷新回默认位） */
+  .music-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.80)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.22)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 998;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+  }
+  .music-widget .mw-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .music-widget .mw-playbtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 8px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.45)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .mw-playbtn[hidden] { display: none; }
+  .music-widget .mw-playbtn img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .mw-playbtn:hover {
+    transform: scale(1.08);
+  }
+  .music-widget .mw-now {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.8);
+    min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* 播放旋转：内芯持续旋转，播放时 running / 暂停时 paused（保持角度，平滑过渡） */
+  @keyframes mw-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .music-widget .nav-music .nm-inner {
+    animation: mw-spin 2.4s linear infinite;
+    animation-play-state: paused;
+  }
+  .music-widget .nav-music.mw-playing .nm-inner {
+    animation-play-state: running;
+  }
+  .mw-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mw-time {
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.75);
+    min-width: 34px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  #musicSeek {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff5fa8, #2bd6ff);
+    outline: none;
+    cursor: pointer;
+  }
+  #musicSeek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
+  }
+  #musicSeek::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    cursor: pointer;
+  }
+  .mw-list {
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .music-widget .mw-list[hidden] { display: none; }
+  .mw-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.6);
+  }
+  .gp-head {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .gp-row {
+    margin-bottom: 12px;
+  }
+  .gp-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .gp-row input[type="range"] {
+    width: 100%;
+    accent-color: #1a6dff;
+    vertical-align: middle;
+  }
+  .gp-val {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 40px;
+  }
+  .gp-bglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .bg-opt {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    color: #ffffff;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-opt:hover {
+    background: linear-gradient(135deg, rgba(138, 92, 255, 0.9), rgba(138, 92, 255, 0.4));
+  }
+  .bg-opt.active {
+    border-color: rgba(255, 255, 255, calc(var(--glass-alpha) * 0.95));
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.5));
+    box-shadow: 0 0 14px rgba(138, 92, 255, calc(var(--glass-alpha) * 0.7)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+  }
+  .gp-empty {
+    font-size: 13px;
+    color: rgba(17, 17, 17, 0.7);
+    padding: 4px 2px;
+  }
+  .gp-note {
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.65);
+  }
+  /* 全站自定义光标：m-1 默认箭头（text 目录本地资源，零外链） */
+  body {
+    cursor: url('/text/m-1.png') 0 0, auto;
+  }
+  /* m-2 手型：所有可点击元素（含各页面 .dl-btn/.plot-btn/.seg-btn/tr.row/棋盘等） */
+  a, button, .bg-opt, .nav-setting, .dl-btn, .plot-btn, .seg-btn, tr.row,
+  .board-area canvas, [role="button"], [onclick], select, summary, label,
+  input[type="submit"], input[type="radio"], input[type="checkbox"], input[type="file"] {
+    cursor: url('/text/m-2.png') 0 0, pointer !important;
+  }
+  /* 全站液态玻璃滚动条：轨道玻璃半透明、滑块粉色 100% -> 30% 渐变、圆角+内高光，hover 加深 */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.12)));
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 1), rgba(255, 105, 180, 0.3));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 0.95), rgba(255, 105, 180, 0.5));
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+
+  .nav { position: relative; z-index: 10; }
+  .toolbar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.16)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.05)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(165%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(165%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.2));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.4)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.22));
+  }
+  .toolbar label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #f2f2f7;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .toolbar input[type="text"] {
+    flex: 1;
+    min-width: 260px;
+    padding: 10px 16px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 17px;
+    color: #ffffff;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.14)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.05)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 10px)) saturate(150%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 10px)) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.22));
+    border-radius: 10px;
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.18));
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .toolbar input[type="text"]:focus {
+    border-color: #8a5cff;
+    box-shadow: 0 0 0 3px rgba(138, 92, 255, calc(var(--glass-alpha) * 0.25));
+  }
+  .toolbar input[type="text"].error {
+    border-color: #ff5f5f;
+    box-shadow: 0 0 0 3px rgba(255, 95, 95, calc(var(--glass-alpha) * 0.22));
+  }
+  .plot-btn {
+    padding: 11px 34px;
+    font-family: inherit;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.22)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.09)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 12px)) saturate(160%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 12px)) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.3));
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.3)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.35)), inset 0 -1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.1));
+    transition: filter 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+  }
+  .plot-btn:hover {
+    filter: brightness(1.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.36)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+  }
+  .plot-btn:active { transform: translateY(1px); }
+  .hint {
+    position: relative;
+    z-index: 5;
+    padding: 10px 24px 8px;
+    font-size: 13px;
+    color: #9a9aac;
+  }
+  .hint code { color: #b9ceff; }
+  .plot-wrap {
+    position: relative;
+    z-index: 5;
+    flex: 1;
+    min-height: 0;
+    margin: 4px 16px 16px;
+    background: linear-gradient(145deg, rgba(10, 11, 17, calc(var(--glass-alpha) * var(--glass-opacity) * 0.35)), rgba(10, 11, 17, calc(var(--glass-alpha) * var(--glass-opacity) * 0.18)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 22px)) saturate(165%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 22px)) saturate(165%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.22));
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.4)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.22)), inset 0 -1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.08));
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    /* 触屏 / 触控笔拖动不触发页面滚动，交给下面的 pointer 事件处理 */
+    touch-action: none;
+    -ms-touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: contain;
+  }
+  canvas.panning { cursor: grabbing; }
+  .err-msg {
+    position: absolute;
+    z-index: 6;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    max-width: 80%;
+    padding: 8px 18px;
+    font-size: 14px;
+    color: #ffd2d2;
+    background: linear-gradient(145deg, rgba(60, 12, 18, calc(var(--glass-alpha) * var(--glass-opacity) * 0.55)), rgba(60, 12, 18, calc(var(--glass-alpha) * var(--glass-opacity) * 0.32)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 12px)) saturate(150%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 12px)) saturate(150%);
+    border: 1px solid rgba(255, 95, 95, calc(var(--glass-alpha) * 0.5));
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.4)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.12));
+    display: none;
+  }
+  @media (max-width: 700px) {
+    .toolbar { flex-wrap: wrap; }
+    .toolbar input[type="text"] { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <a class="home" href="/">主页</a>
+    <a href="/download">下载中心</a>
+    <a href="/games.html">小游戏中心</a>
+    <div class="nav-actions">
+      <button type="button" class="nav-setting" id="navSettingBtn" title="设置">
+        <img src="/text/setting.png" alt="设置">
+      </button>
+    </div>
+  </nav>
+  <div class="music-widget" id="musicWidget" title="可拖动，刷新回到默认位置">
+    <div class="mw-head">
+      <button type="button" class="nav-music" id="navMusicBtn" title="展开/收起曲目列表" aria-label="音乐播放器">
+        <span class="nm-inner"><img src="/text/music.png" alt="音乐"></span>
+      </button>
+      <div class="mw-now" id="musicNow">未播放</div>
+      <button type="button" class="mw-playbtn" id="musicPlayBtn" title="播放/暂停" aria-label="播放/暂停" hidden>
+        <img id="musicPlayImg" src="/text/play.png" alt="播放/暂停">
+      </button>
+    </div>
+    <div class="mw-progress">
+      <span class="mw-time" id="musicCur">0:00</span>
+      <input type="range" id="musicSeek" min="0" max="1000" value="0" step="1" aria-label="播放进度">
+      <span class="mw-time" id="musicDur">0:00</span>
+    </div>
+    <div class="gp-bglist mw-list" id="musicList" hidden>
+      <button type="button" class="bg-opt music-opt" data-mp3="/music/Shape%20of%20You.mp3">Shape of You.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E6%88%91%E6%9C%AC%E5%B0%86%E5%BF%83%E5%90%91%E6%98%8E%E6%9C%88.mp3">我本将心向明月.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%80%81%E7%94%B7%E5%AD%A9.mp3">老男孩.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E8%99%9E%E5%85%AE%E5%8F%B9.mp3">虞兮叹.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%9B%A8%E7%88%B1.mp3">雨爱.mp3</button>
+<button type="button" class="bg-opt music-opt" data-mp3="/music/%E9%B8%B3%E9%B8%AF%E6%88%8F.mp3">鸳鸯戏.mp3</button>
+    </div>
+    <div class="mw-note">点击曲目播放，再次点击同一曲目暂停/继续；拖动进度条可跳转</div>
+  </div>
+  <div class="glass-pop" id="glassPop" hidden>
+    <div class="gp-head">站点设置</div>
+    <div class="gp-row">
+      <span class="gp-label">亮度</span>
+      <input type="range" id="glassAlpha" min="25" max="100" value="100" step="1">
+      <span class="gp-val" id="glassAlphaVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">不透明度</span>
+      <input type="range" id="glassOpacity" min="0" max="100" value="100" step="1">
+      <span class="gp-val" id="glassOpacityVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">背景图片（C:\Thome\Pictures）</span>
+      <div class="gp-bglist" id="bgList">
+        <button type="button" class="bg-opt" data-bg="/pictures/fragmented-pink-haired-pilot-2160.png">fragmented-pink-haired-pilot-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/holiday-morning-glow-2160.png">holiday-morning-glow-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-grid-descent-2160.png">neon-grid-descent-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-tower-runner-2160.png">neon-tower-runner-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pastel-dessert-table-2160.png">pastel-dessert-table-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pink-haired-girl-and-plushies-2160.jpg">pink-haired-girl-and-plushies-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-idol-celebration-2160.jpg">starlight-idol-celebration-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-reverie-2160.jpg">starlight-reverie-2160.jpg</button>
+      </div>
+    </div>
+    <div class="gp-note">改动实时生效，自动保存在本机浏览器</div>
+  </div>
+  <script>
+  (function () {
+    var pop = document.getElementById('glassPop');
+    var btn = document.getElementById('navSettingBtn');
+    var alpha = document.getElementById('glassAlpha');
+    var alphaVal = document.getElementById('glassAlphaVal');
+    var opacity = document.getElementById('glassOpacity');
+    var opacityVal = document.getElementById('glassOpacityVal');
+    var bgList = document.getElementById('bgList');
+    var musicBtn = document.getElementById('navMusicBtn');
+    var musicWidget = document.getElementById('musicWidget');
+    var musicList = document.getElementById('musicList');
+    var musicNow = document.getElementById('musicNow');
+    var musicSeek = document.getElementById('musicSeek');
+    var musicCur = document.getElementById('musicCur');
+    var musicDur = document.getElementById('musicDur');
+    var musicPlayBtn = document.getElementById('musicPlayBtn');
+    var musicPlayImg = document.getElementById('musicPlayImg');
+    var audio = null;
+    var currentMp3 = '';
+    var currentLabel = '';
+    var KEY_ALPHA = 'thome-glass-alpha';
+    var KEY_OPACITY = 'thome-glass-opacity';
+    var KEY_BG = 'thome-bg';
+
+    function setVar(name, v) {
+      document.documentElement.style.setProperty(name, String(v));
+    }
+    function applyAlpha(v) {
+      setVar('--glass-alpha', v / 100);
+      try { localStorage.setItem(KEY_ALPHA, String(v)); } catch (e) {}
+    }
+    function applyOpacity(v) {
+      setVar('--glass-opacity', v / 100);
+      try { localStorage.setItem(KEY_OPACITY, String(v)); } catch (e) {}
+    }
+    alpha.addEventListener('input', function () {
+      alphaVal.textContent = alpha.value + '%';
+      applyAlpha(alpha.value);
+    });
+    opacity.addEventListener('input', function () {
+      opacityVal.textContent = opacity.value + '%';
+      applyOpacity(opacity.value);
+    });
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      pop.hidden = !pop.hidden;
+    });
+    musicBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      musicList.hidden = !musicList.hidden;
+    });
+    document.addEventListener('click', function (e) {
+      if (!pop.hidden && !(pop.contains(e.target) || btn.contains(e.target))) {
+        pop.hidden = true;
+      }
+      if (!musicList.hidden && !musicWidget.contains(e.target)) {
+        musicList.hidden = true;
+      }
+    });
+    function applyBg(url) {
+      if (url) {
+        document.body.style.backgroundImage = 'url("' + url + '")';
+      } else {
+        document.body.style.backgroundImage = '';
+      }
+    }
+    function markActive(url) {
+      var opts = bgList.querySelectorAll('.bg-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-bg') === url);
+      }
+    }
+    bgList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== bgList && !(t.getAttribute && t.getAttribute('data-bg'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-bg') : null;
+      if (!url) return;
+      applyBg(url);
+      try { localStorage.setItem(KEY_BG, url); } catch (e) {}
+      markActive(url);
+    });
+    function setMusicNow(text) {
+      musicNow.textContent = text;
+    }
+    function markMusicActive(url) {
+      var opts = musicList.querySelectorAll('.music-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-mp3') === url);
+      }
+    }
+    function stopAudio() {
+      if (audio) {
+        audio.pause();
+        audio = null;
+      }
+      currentMp3 = '';
+      currentLabel = '';
+      musicBtn.classList.remove('mw-playing');
+      musicSeek.value = 0;
+      musicCur.textContent = '0:00';
+      musicDur.textContent = '0:00';
+      syncPlayBtn();
+    }
+    /* 播放控制按钮图标联动：有曲目时显示，播放=stop 样式，暂停=play 样式 */
+    function syncPlayBtn() {
+      if (audio && currentMp3) {
+        musicPlayBtn.hidden = false;
+        musicPlayImg.src = audio.paused ? '/text/play.png' : '/text/stop.png';
+      } else {
+        musicPlayBtn.hidden = true;
+      }
+    }
+    musicPlayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!audio || !currentMp3) return;
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('mw-playing');
+        setMusicNow('正在播放：' + currentLabel);
+        syncPlayBtn();
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('mw-playing');
+        setMusicNow('已暂停：' + currentLabel);
+        syncPlayBtn();
+      }
+    });
+    function fmtTime(t) {
+      t = Math.floor(t || 0);
+      var m = Math.floor(t / 60);
+      var s = t % 60;
+      return m + ':' + (s < 10 ? '0' + s : '' + s);
+    }
+    function updateProgress() {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        musicSeek.value = Math.round(audio.currentTime / audio.duration * 1000);
+        musicCur.textContent = fmtTime(audio.currentTime);
+        musicDur.textContent = fmtTime(audio.duration);
+      }
+    }
+    musicList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== musicList && !(t.getAttribute && t.getAttribute('data-mp3'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-mp3') : null;
+      var label = t && t.textContent ? t.textContent : url;
+      if (!url) return;
+      if (currentMp3 === url) {
+        if (audio && !audio.paused) {
+          audio.pause();
+          musicBtn.classList.remove('mw-playing');
+          setMusicNow('已暂停：' + label);
+          syncPlayBtn();
+        } else if (audio) {
+          audio.play();
+          musicBtn.classList.add('mw-playing');
+          setMusicNow('正在播放：' + label);
+          syncPlayBtn();
+        }
+        return;
+      }
+      stopAudio();
+      currentMp3 = url;
+      currentLabel = label;
+      audio = new Audio(url);
+      audio.addEventListener('loadedmetadata', updateProgress);
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', function () {
+        musicBtn.classList.remove('mw-playing');
+        currentMp3 = '';
+        currentLabel = '';
+        setMusicNow('播放结束：' + label);
+        markMusicActive('');
+        syncPlayBtn();
+      });
+      audio.play();
+      musicBtn.classList.add('mw-playing');
+      setMusicNow('正在播放：' + label);
+      markMusicActive(url);
+      syncPlayBtn();
+    });
+    /* 进度条拖动 seek：拖动不中断音频流 */
+    musicSeek.addEventListener('input', function () {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = audio.duration * musicSeek.value / 1000;
+        musicCur.textContent = fmtTime(audio.currentTime);
+      }
+    });
+    /* 组件拖动：mousedown/mousemove/mouseup，限制在视口内，避开按钮与进度条 */
+    var mwDrag = null;
+    musicWidget.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      e.preventDefault();
+      var rect = musicWidget.getBoundingClientRect();
+      musicWidget.style.left = rect.left + 'px';
+      musicWidget.style.top = rect.top + 'px';
+      musicWidget.style.bottom = 'auto';
+      musicWidget.style.right = 'auto';
+      mwDrag = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!mwDrag) return;
+      var x = e.clientX - mwDrag.dx;
+      var y = e.clientY - mwDrag.dy;
+      x = Math.max(0, Math.min(x, window.innerWidth - musicWidget.offsetWidth));
+      y = Math.max(0, Math.min(y, window.innerHeight - musicWidget.offsetHeight));
+      musicWidget.style.left = x + 'px';
+      musicWidget.style.top = y + 'px';
+    });
+    document.addEventListener('mouseup', function () {
+      mwDrag = null;
+    });
+    /* 页面加载时恢复已保存设置 */
+    try {
+      var a = localStorage.getItem(KEY_ALPHA);
+      if (a !== null) {
+        alpha.value = a;
+        alphaVal.textContent = a + '%';
+        setVar('--glass-alpha', Number(a) / 100);
+      }
+      var o = localStorage.getItem(KEY_OPACITY);
+      if (o !== null) {
+        opacity.value = o;
+        opacityVal.textContent = o + '%';
+        setVar('--glass-opacity', Number(o) / 100);
+      }
+      var b = localStorage.getItem(KEY_BG);
+      if (b) {
+        var url = b;
+        try {
+          var obj = JSON.parse(b);
+          if (obj && obj.type === 'upload' && obj.data) url = obj.data;
+        } catch (e) {}
+        if (url) {
+          applyBg(url);
+          markActive(url);
+        }
+      }
+    } catch (e) {}
+    syncPlayBtn();
+  })();
+  </script>
+
+<div class="toolbar">
+  <label for="fn-input">f(x) =</label>
+  <input type="text" id="fn-input" value="sin(x)" spellcheck="false" autocomplete="off" placeholder="例如：sin(x)、x^2+1、exp(-x)*cos(x)">
+  <button type="button" id="plot-btn" class="plot-btn">确定</button>
+</div>
+<div class="hint">支持的运算：+ - * / ^ ( )　支持的函数：sin cos tan asin acos atan exp log ln sqrt abs floor ceil　常数：pi、e　·　拖拽平移，滚轮缩放</div>
+<div class="plot-wrap">
+  <canvas id="plot-canvas"></canvas>
+  <div class="err-msg" id="err-msg"></div>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  // ---------------- 表达式解析 ----------------
+  function tokenize(src) {
+    var tokens = [];
+    var i = 0;
+    var n = src.length;
+    while (i < n) {
+      var ch = src[i];
+      if (ch === " " || ch === "\t" || ch === "\r" || ch === "\n") { i++; continue; }
+      if (ch === "+" || ch === "-" || ch === "*" || ch === "/" || ch === "^" ||
+          ch === "(" || ch === ")" || ch === ",") {
+        tokens.push({ type: ch, value: ch });
+        i++;
+        continue;
+      }
+      if ((ch >= "0" && ch <= "9") || ch === ".") {
+        var start = i;
+        while (i < n && ((src[i] >= "0" && src[i] <= "9") || src[i] === ".")) i++;
+        if (i < n && (src[i] === "e" || src[i] === "E")) {
+          var j = i + 1;
+          if (j < n && (src[j] === "+" || src[j] === "-")) j++;
+          if (j < n && src[j] >= "0" && src[j] <= "9") {
+            while (j < n && src[j] >= "0" && src[j] <= "9") j++;
+            i = j;
+          }
+        }
+        var numStr = src.slice(start, i);
+        if (numStr === ".") throw new Error("无效的数字：. ");
+        var num = parseFloat(numStr);
+        if (isNaN(num)) throw new Error("无效的数字：" + numStr);
+        tokens.push({ type: "num", value: num });
+        continue;
+      }
+      if ((ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || ch === "_") {
+        var s2 = i;
+        while (i < n && ((src[i] >= "a" && src[i] <= "z") || (src[i] >= "A" && src[i] <= "Z") ||
+                         (src[i] >= "0" && src[i] <= "9") || src[i] === "_")) i++;
+        tokens.push({ type: "name", value: src.slice(s2, i) });
+        continue;
+      }
+      throw new Error("无法识别的字符：" + ch);
+    }
+    tokens.push({ type: "end", value: null });
+    return tokens;
+  }
+
+  function parseExpression(src) {
+    var tokens = tokenize(src);
+    var pos = 0;
+
+    function peek() { return tokens[pos]; }
+    function next() { return tokens[pos++]; }
+    function expect(type) {
+      var t = next();
+      if (t.type !== type) throw new Error("期望 \"" + type + "\"，却遇到 " + (t.value === null ? "结尾" : "\"" + t.value + "\""));
+      return t;
+    }
+
+    function parseExpr() {
+      var left = parseTerm();
+      while (true) {
+        var t = peek();
+        if (t.type === "+") { next(); left = { type: "op", op: "+", a: left, b: parseTerm() }; }
+        else if (t.type === "-") { next(); left = { type: "op", op: "-", a: left, b: parseTerm() }; }
+        else break;
+      }
+      return left;
+    }
+
+    function parseTerm() {
+      var left = parseFactor();
+      while (true) {
+        var t = peek();
+        if (t.type === "*") { next(); left = { type: "op", op: "*", a: left, b: parseFactor() }; }
+        else if (t.type === "/") { next(); left = { type: "op", op: "/", a: left, b: parseFactor() }; }
+        else break;
+      }
+      return left;
+    }
+
+    function parseFactor() {
+      var t = peek();
+      if (t.type === "-") { next(); return { type: "neg", a: parseFactor() }; }
+      if (t.type === "+") { next(); return parseFactor(); }
+      return parsePower();
+    }
+
+    function parsePower() {
+      var base = parsePrimary();
+      if (peek().type === "^") {
+        next();
+        var exponent = parseFactor();
+        return { type: "op", op: "^", a: base, b: exponent };
+      }
+      return base;
+    }
+
+    function parsePrimary() {
+      var t = peek();
+      if (t.type === "num") { next(); return { type: "num", value: t.value }; }
+      if (t.type === "name") {
+        next();
+        var name = t.value;
+        if (peek().type === "(") {
+          next();
+          var args = [];
+          if (peek().type !== ")") {
+            args.push(parseExpr());
+            while (peek().type === ",") { next(); args.push(parseExpr()); }
+          }
+          expect(")");
+          return { type: "call", name: name, args: args };
+        }
+        if (name === "x") return { type: "var" };
+        if (name === "pi") return { type: "num", value: Math.PI };
+        if (name === "e") return { type: "num", value: Math.E };
+        throw new Error("未知的变量或常量：" + name);
+      }
+      if (t.type === "(") {
+        next();
+        var inner = parseExpr();
+        expect(")");
+        return inner;
+      }
+      throw new Error("意外的 " + (t.value === null ? "结尾" : "\"" + t.value + "\""));
+    }
+
+    var ast = parseExpr();
+    if (peek().type !== "end") throw new Error("多余的输入：" + peek().value);
+    return ast;
+  }
+
+  var FUNCTIONS = {
+    sin: Math.sin, cos: Math.cos, tan: Math.tan,
+    asin: Math.asin, acos: Math.acos, atan: Math.atan,
+    exp: Math.exp, log: Math.log, ln: Math.log,
+    sqrt: Math.sqrt, abs: Math.abs,
+    floor: Math.floor, ceil: Math.ceil
+  };
+
+  function compile(ast) {
+    switch (ast.type) {
+      case "num":
+        return (function (v) { return function () { return v; }; })(ast.value);
+      case "var":
+        return function (x) { return x; };
+      case "neg":
+        var neg = compile(ast.a);
+        return function (x) { return -neg(x); };
+      case "op": {
+        var left = compile(ast.a);
+        var right = compile(ast.b);
+        switch (ast.op) {
+          case "+": return function (x) { return left(x) + right(x); };
+          case "-": return function (x) { return left(x) - right(x); };
+          case "*": return function (x) { return left(x) * right(x); };
+          case "/": return function (x) { return left(x) / right(x); };
+          case "^": return function (x) { return Math.pow(left(x), right(x)); };
+        }
+        throw new Error("未知运算符：" + ast.op);
+      }
+      case "call": {
+        var fn = FUNCTIONS[ast.name];
+        if (!fn) throw new Error("未知函数：" + ast.name);
+        var args = ast.args.map(compile);
+        if (args.length !== fn.length) throw new Error("函数 " + ast.name + " 需要 " + fn.length + " 个参数");
+        return function (x) {
+          var vals = new Array(args.length);
+          for (var i = 0; i < args.length; i++) vals[i] = args[i](x);
+          return fn.apply(null, vals);
+        };
+      }
+      default:
+        throw new Error("未知表达式节点");
+    }
+  }
+
+  // ---------------- Canvas 绘图 ----------------
+  var canvas = document.getElementById("plot-canvas");
+  var ctx = canvas.getContext("2d");
+  var input = document.getElementById("fn-input");
+  var btn = document.getElementById("plot-btn");
+  var errBox = document.getElementById("err-msg");
+
+  var dpr = window.devicePixelRatio || 1;
+  var view = { cx: 0, cy: 0, scale: 40 };
+  var fn = null;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    var rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    draw();
+  }
+  window.addEventListener("resize", resize);
+
+  function showError(msg) {
+    errBox.textContent = msg;
+    errBox.style.display = "block";
+    input.classList.add("error");
+  }
+  function clearError() {
+    errBox.style.display = "none";
+    input.classList.remove("error");
+  }
+
+  function plot() {
+    var text = input.value.trim();
+    if (!text) { fn = null; clearError(); draw(); return; }
+    try {
+      var ast = parseExpression(text);
+      fn = compile(ast);
+      clearError();
+    } catch (e) {
+      fn = null;
+      showError("表达式错误：" + e.message);
+    }
+    draw();
+  }
+
+  btn.addEventListener("click", plot);
+  input.addEventListener("keydown", function (e) { if (e.key === "Enter") plot(); });
+
+  function niceStep(rough) {
+    var exp = Math.floor(Math.log(rough) / Math.LN10);
+    var base = Math.pow(10, exp);
+    var r = rough / base;
+    var m;
+    if (r < 1.5) m = 1;
+    else if (r < 3) m = 2;
+    else if (r < 7) m = 5;
+    else m = 10;
+    return m * base;
+  }
+
+  function fmtNum(v) {
+    if (Math.abs(v) < 1e-10) v = 0;
+    var a = Math.abs(v);
+    if (a >= 1e6 || (a > 0 && a < 1e-4)) return v.toExponential(1);
+    return String(parseFloat(v.toFixed(4)));
+  }
+
+  function draw() {
+    var w = canvas.width / dpr;
+    var h = canvas.height / dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "#0a0b11";
+    ctx.fillRect(0, 0, w, h);
+
+    var cx = w / 2 - view.cx * view.scale;
+    var cy = h / 2 + view.cy * view.scale;
+    function sx(v) { return cx + v * view.scale; }
+    function sy(v) { return cy - v * view.scale; }
+    function dataX(px) { return (px - cx) / view.scale; }
+    function dataY(py) { return (cy - py) / view.scale; }
+
+    var xMin = dataX(0), xMax = dataX(w);
+    var yMin = dataY(h), yMax = dataY(0);
+    if (!isFinite(xMin) || !isFinite(xMax) || !isFinite(yMin) || !isFinite(yMax)) return;
+
+    var step = niceStep(80 / view.scale);
+
+    // 网格
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255,255,255,0.07)";
+    ctx.beginPath();
+    var gx = Math.floor(xMin / step) * step;
+    for (; gx <= xMax; gx += step) {
+      var px = Math.round(sx(gx)) + 0.5;
+      ctx.moveTo(px, 0);
+      ctx.lineTo(px, h);
+    }
+    var gy = Math.floor(yMin / step) * step;
+    for (; gy <= yMax; gy += step) {
+      var py = Math.round(sy(gy)) + 0.5;
+      ctx.moveTo(0, py);
+      ctx.lineTo(w, py);
+    }
+    ctx.stroke();
+
+    // 坐标轴
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.beginPath();
+    if (yMin <= 0 && yMax >= 0) {
+      var ax = Math.round(sx(0)) + 0.5;
+      ctx.moveTo(ax, 0);
+      ctx.lineTo(ax, h);
+    }
+    if (xMin <= 0 && xMax >= 0) {
+      var ay = Math.round(sy(0)) + 0.5;
+      ctx.moveTo(0, ay);
+      ctx.lineTo(w, ay);
+    }
+    ctx.stroke();
+
+    // 刻度
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "12px Consolas, \"Courier New\", monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    var tx0 = Math.floor(xMin / step) * step;
+    for (var tx = tx0; tx <= xMax; tx += step) {
+      var tpx = sx(tx);
+      if (Math.abs(tpx - sx(0)) > 16) ctx.fillText(fmtNum(tx), tpx + 4, sy(0) + 5);
+    }
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    var ty0 = Math.floor(yMin / step) * step;
+    for (var ty = ty0; ty <= yMax; ty += step) {
+      var tpy = sy(ty);
+      if (Math.abs(tpy - sy(0)) > 13) ctx.fillText(fmtNum(ty), sx(0) - 6, tpy + 1);
+    }
+    if (xMin <= 0 && xMax >= 0 && yMin <= 0 && yMax >= 0) {
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      ctx.fillText("O", sx(0) + 7, sy(0) + 5);
+    }
+
+    // 函数曲线
+    if (fn) {
+      ctx.strokeStyle = "#ff5f8f";
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      var started = false;
+      var samples = Math.max(400, Math.floor(w));
+      for (var i = 0; i <= samples; i++) {
+        var dx = xMin + (xMax - xMin) * i / samples;
+        var dy;
+        try { dy = fn(dx); } catch (e) { dy = NaN; }
+        if (!isFinite(dy)) { started = false; continue; }
+        var pxx = sx(dx), pyy = sy(dy);
+        if (pyy < -10000 || pyy > h + 10000) { started = false; continue; }
+        if (!started) { ctx.moveTo(pxx, pyy); started = true; }
+        else { ctx.lineTo(pxx, pyy); }
+      }
+      ctx.stroke();
+    }
+  }
+
+  // 坐标换算（供交互使用）
+  function screenToX(px) {
+    var w = canvas.width / dpr;
+    return (px - w / 2) / view.scale + view.cx;
+  }
+  function screenToY(py) {
+    var h = canvas.height / dpr;
+    return (h / 2 - py) / view.scale + view.cy;
+  }
+
+  // 拖拽平移（Pointer Events：鼠标 / 触屏 / 触控笔通用）
+  // preventDefault + touch-action: none：拖动只在网格窗口内平移，不滚动整页
+  var dragging = false, lastX = 0, lastY = 0, activePointer = null;
+
+  canvas.addEventListener("pointerdown", function (e) {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    e.preventDefault();
+    dragging = true;
+    activePointer = e.pointerId;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    canvas.classList.add("panning");
+    if (canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    }
+  });
+
+  canvas.addEventListener("pointermove", function (e) {
+    if (!dragging || e.pointerId !== activePointer) return;
+    e.preventDefault();
+    view.cx -= (e.clientX - lastX) / view.scale;
+    view.cy += (e.clientY - lastY) / view.scale;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    draw();
+  });
+
+  function endPan(e) {
+    if (!dragging) return;
+    dragging = false;
+    activePointer = null;
+    canvas.classList.remove("panning");
+    if (e && canvas.releasePointerCapture) {
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+    }
+  }
+  canvas.addEventListener("pointerup", endPan);
+  canvas.addEventListener("pointercancel", endPan);
+  canvas.addEventListener("lostpointercapture", endPan);
+
+  // 滚轮缩放（以鼠标位置为中心）
+  canvas.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    var rect = canvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    var mxData = screenToX(mx);
+    var myData = screenToY(my);
+    var factor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
+    var ns = Math.min(4000, Math.max(0.5, view.scale * factor));
+    var k = ns / view.scale;
+    view.cx = mxData - (mxData - view.cx) * k;
+    view.cy = myData - (myData - view.cy) * k;
+    view.scale = ns;
+    draw();
+  }, { passive: false });
+
+  // 初始绘制
+  plot();
+  resize();
+})();
+</script>
+</body>
+</html>
