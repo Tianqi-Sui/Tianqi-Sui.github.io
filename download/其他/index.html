@@ -674,8 +674,8 @@
 
 
 <style>
-  /* ===== 导航栏搜索框 v2（注入） ===== */
-  .eggsearch{ display:flex; align-items:center; margin-right:6px; }
+  /* ===== 导航栏搜索框 v3（注入） ===== */
+  .eggsearch{ display:flex; align-items:center; margin-right:8px; }
   .eggsearch-btn{
     flex:none; display:flex; align-items:center; justify-content:center;
     width:34px; height:34px; padding:0;
@@ -692,8 +692,8 @@
     font-size:14px; color:#111; outline:none; opacity:0; overflow:hidden;
     transition:width .4s cubic-bezier(.4,0,.2,1), opacity .2s, padding .4s, border-color .2s;
   }
-  .eggsearch.active .eggsearch-btn{ transform:translateX(-224px); }
-  .eggsearch.active .eggsearch-input{ width:220px; padding:0 12px; opacity:1; border-color:rgba(17,17,17,0.2); }
+  .eggsearch.active .eggsearch-btn{ transform:translateX(-12px); }
+  .eggsearch.active .eggsearch-input{ width:200px; padding:0 12px; opacity:1; border-color:rgba(17,17,17,0.2); }
   .eggsearch.active .eggsearch-input:focus{ border-color:#8a5cff; box-shadow:0 0 0 3px rgba(138,92,255,0.18); }
   /* 下拉结果（导航栏外） */
   #eggSearchWrap{
@@ -714,8 +714,8 @@
   #eggSearchEdge{ margin-top:6px; border-top:1px solid rgba(17,17,17,0.12); padding:8px 4px 2px; color:#1a6dff; font-size:13px; cursor:pointer; }
   #eggSearchEdge:hover{ text-decoration:underline; }
   @media (max-width:820px){
-    .eggsearch.active .eggsearch-btn{ transform:translateX(-152px); }
-    .eggsearch.active .eggsearch-input{ width:148px; padding:0 10px; }
+    .eggsearch.active .eggsearch-btn{ transform:translateX(-8px); }
+    .eggsearch.active .eggsearch-input{ width:130px; padding:0 10px; }
     #eggSearchWrap{ top:58px; left:16px; right:16px; width:auto; max-width:none; }
   }
 </style>
@@ -730,10 +730,10 @@
     <div class="nav-actions">
 
       <div class="eggsearch" id="eggSearchBox">
-        <input class="eggsearch-input" id="eggSearchInput" type="text" placeholder="搜索站内页面…" autocomplete="off">
         <button type="button" class="eggsearch-btn" id="eggSearchBtn" title="搜索">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </button>
+        <input class="eggsearch-input" id="eggSearchInput" type="text" placeholder="搜索站内页面…" autocomplete="off">
       </div>
 
 
