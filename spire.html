@@ -594,6 +594,40 @@ body{font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;min-height:10
   }
 })();
 </script>
+
+
+  /* ===== 隐藏彩蛋：隐秘入口 + 模拟下载中心（注入） ===== */
+  #eggOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #eggOverlay.on{display:flex}
+  #eggGlass{background:linear-gradient(145deg,rgba(255,255,255,.85),rgba(255,255,255,.55));backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border:1px solid rgba(255,255,255,.5);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.6);padding:28px 30px;width:340px;max-width:88vw;text-align:center;color:#111;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  #eggGlass h3{margin:0 0 6px;font-weight:600;font-size:18px}
+  #eggGlass .egg-hint{font-size:12px;color:#666;margin-bottom:16px}
+  #eggGlass input{width:100%;padding:10px 12px;border:1px solid rgba(17,17,17,.15);border-radius:10px;background:rgba(255,255,255,.6);font-size:14px;box-sizing:border-box;outline:none;color:#111}
+  #eggGlass input:focus{border-color:#8a5cff;box-shadow:0 0 0 3px rgba(138,92,255,.18)}
+  #eggGlass .egg-err{color:#e53935;font-size:12px;min-height:16px;margin-top:6px}
+  #eggGlass .egg-btn{margin-top:14px;width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#8a5cff,#6a3fd8);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+  #eggGlass .egg-btn:hover{filter:brightness(1.08)}
+  #eggDlOverlay{position:fixed;inset:0;z-index:99998;display:none;flex-direction:column;background:rgba(20,24,34,.62);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);color:#fff;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  #eggDlOverlay.on{display:flex}
+  #eggDlHead{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05))}
+  #eggDlHead h2{margin:0;font-size:18px;font-weight:600}
+  #eggDlBack{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:9px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+  #eggDlBack:hover{background:rgba(255,255,255,.26)}
+  #eggDlBody{flex:1;overflow:auto;padding:18px 22px}
+  #eggDlTable{width:100%;border-collapse:collapse;font-size:14px}
+  #eggDlTable th,#eggDlTable td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.12);vertical-align:middle}
+  #eggDlTable th{color:#cfd6e4;font-weight:500;position:sticky;top:0;background:rgba(30,34,46,.9)}
+  #eggDlEmpty{color:#9aa7bd;font-size:13px;padding:30px;text-align:center;display:none}
+  .egg-name{word-break:break-all}
+  .egg-dl-btn{background:linear-gradient(135deg,#8a5cff,#6a3fd8);border:none;color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+  .egg-dl-btn:hover{filter:brightness(1.08)}
+  @media (max-width:820px){
+    #eggDlHead{padding:12px 14px}
+    #eggDlBody{padding:12px 10px}
+    #eggDlTable{font-size:13px}
+    #eggDlTable th,#eggDlTable td{padding:8px 8px}
+  }
+
 </head>
 <body>
 <div id="pageBg"></div>
@@ -1363,5 +1397,105 @@ if(!localStorage.getItem(LS+'tutorial-seen')){setTimeout(openTut,300);}
 newRun();
 })();
 </script>
+
+
+<!-- ===== 隐藏彩蛋：隐秘入口 + 模拟下载中心（注入） ===== -->
+<div id="eggOverlay">
+  <div id="eggGlass">
+    <h3>隐秘入口</h3>
+    <div class="egg-hint">请输入通行口令</div>
+    <input id="eggPwd" type="password" placeholder="••••••••" autocomplete="off">
+    <div class="egg-err" id="eggErr"></div>
+    <button class="egg-btn" id="eggOk">进入</button>
+  </div>
+</div>
+<div id="eggDlOverlay">
+  <div id="eggDlHead">
+    <h2>模拟下载中心</h2>
+    <button id="eggDlBack">返回</button>
+  </div>
+  <div id="eggDlBody">
+    <table id="eggDlTable">
+      <thead><tr><th>名称</th><th>大小</th><th>操作</th></tr></thead>
+      <tbody id="eggDlTbody"></tbody>
+    </table>
+    <div id="eggDlEmpty">暂无文件</div>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  var PWD = 'xx xxx';
+  var SEQ = 'wwssaaddqe';
+  var keys = '';
+  var ov = document.getElementById('eggOverlay');
+  var dl = document.getElementById('eggDlOverlay');
+  var pwd = document.getElementById('eggPwd');
+  var err = document.getElementById('eggErr');
+  var tbody = document.getElementById('eggDlTbody');
+  var empty = document.getElementById('eggDlEmpty');
+  var DLBASE = '/text/' + encodeURIComponent('download？？？') + '/';
+
+  function fmt(n) {
+    if (n >= 1073741824) return (n / 1073741824).toFixed(2) + ' GB';
+    if (n >= 1048576) return (n / 1048576).toFixed(2) + ' MB';
+    if (n >= 1024) return (n / 1024).toFixed(2) + ' KB';
+    return (n || 0) + ' B';
+  }
+  function showPwd() { keys = ''; ov.classList.add('on'); pwd.value = ''; err.textContent = ''; setTimeout(function () { pwd.focus(); }, 30); }
+  function hidePwd() { ov.classList.remove('on'); }
+  function hideDl() { dl.classList.remove('on'); }
+  function loadDl() {
+    fetch(DLBASE + 'files.json').then(function (r) { return r.json(); }).then(function (list) {
+      tbody.innerHTML = '';
+      var arr = Array.isArray(list) ? list : [];
+      empty.style.display = arr.length ? 'none' : 'block';
+      empty.textContent = '暂无文件';
+      arr.forEach(function (it) {
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td'); td1.className = 'egg-name'; td1.textContent = it.name;
+        var td2 = document.createElement('td'); td2.textContent = fmt(it.size);
+        var td3 = document.createElement('td');
+        var a = document.createElement('a'); a.className = 'egg-dl-btn'; a.textContent = '下载';
+        a.href = DLBASE + encodeURIComponent(it.name); a.target = '_blank'; a.rel = 'noopener';
+        td3.appendChild(a);
+        tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+        tbody.appendChild(tr);
+      });
+    }).catch(function () {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      empty.textContent = '加载失败';
+    });
+  }
+  function openDl() { hidePwd(); dl.classList.add('on'); loadDl(); }
+  function enter() {
+    if (pwd.value === PWD) { openDl(); }
+    else { err.textContent = '口令不正确'; pwd.select(); }
+  }
+  document.addEventListener('keydown', function (e) {
+    if (dl.classList.contains('on')) return;
+    var t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) {
+      if (t.id !== 'eggPwd') keys = '';
+      return;
+    }
+    if (e.key && e.key.length === 1) {
+      keys = (keys + e.key.toLowerCase());
+      if (keys.length > SEQ.length) keys = keys.slice(-SEQ.length);
+      if (keys === SEQ) showPwd();
+    }
+  });
+  document.getElementById('eggOk').addEventListener('click', enter);
+  pwd.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') enter(); });
+  ov.addEventListener('click', function (e) { if (e.target === ov) hidePwd(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { if (!dl.classList.contains('on')) hidePwd(); }
+  });
+  document.getElementById('eggDlBack').addEventListener('click', hideDl);
+})();
+</script>
+
 </body>
 </html>
