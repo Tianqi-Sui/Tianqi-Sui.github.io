@@ -163,6 +163,41 @@
     font-size: 12px;
     color: rgba(17, 17, 17, 0.65);
   }
+  /* 上传背景图按钮 */
+  .bg-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px dashed rgba(138, 92, 255, 0.8);
+    border-radius: 10px;
+    background: rgba(138, 92, 255, 0.12);
+    color: #5a2fcf;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .bg-upload-btn:hover {
+    background: rgba(138, 92, 255, 0.22);
+  }
+  /* 全站液态玻璃滚动条：轨道玻璃半透明、滑块粉色 100% -> 30% 渐变、圆角+内高光，hover 加深 */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.12)));
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 1), rgba(255, 105, 180, 0.3));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 0.95), rgba(255, 105, 180, 0.5));
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
   @media (max-width: 820px) {
     .glass-pop { width: auto; max-width: none; left: 16px; right: 16px; top: 58px; }
   }
@@ -240,6 +275,8 @@
       <button type="button" class="bg-opt" data-bg="/pictures/starlight-reverie-2160.jpg">starlight-reverie-2160.jpg</button>
     </div>
   </div>
+  <label class="bg-upload-btn" for="expBgUpload">上传本地图片作为背景</label>
+  <input type="file" id="expBgUpload" accept="image/*" style="display:none;">
   <div class="gp-note" style="margin-top:8px;">背景切换实时生效，保留雪花深色遮罩。刷新恢复默认背景。</div>
 </div>
 
@@ -328,6 +365,22 @@ expBgList.addEventListener('click', function (e) {
   if (!url) return;
   applyExpBg(url);
   markExpBg(url);
+});
+// 上传本地图片作为背景（即时生效，刷新恢复默认）
+const expBgUpload = document.getElementById('expBgUpload');
+expBgUpload.addEventListener('change', function () {
+  const file = expBgUpload.files && expBgUpload.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function () {
+    const url = String(reader.result);
+    applyExpBg(url);
+    // 上传后清除内置选项高亮
+    const opts = expBgList.querySelectorAll('.bg-opt');
+    for (let i = 0; i < opts.length; i++) opts[i].classList.remove('active');
+    expBgUpload.value = '';
+  };
+  reader.readAsDataURL(file);
 });
 // 默认背景（starlight-idol-celebration）已在 CSS 变量缺省时生效
 
