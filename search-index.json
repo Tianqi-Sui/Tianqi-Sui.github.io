@@ -1,0 +1,57 @@
+[
+  {
+    "path": "/",
+    "title": "主页",
+    "kw": "主页 首页 个人主页 站主 UP B站 首页"
+  },
+  {
+    "path": "/download",
+    "title": "下载中心",
+    "kw": "下载 下载中心 文件 资源 美化包 其他"
+  },
+  {
+    "path": "/games.html",
+    "title": "小游戏中心",
+    "kw": "小游戏 游戏 游戏中心 小游戏中心"
+  },
+  {
+    "path": "/dino.html",
+    "title": "谷歌恐龙闯关",
+    "kw": "恐龙 谷歌恐龙 恐龙闯关 跑酷 跳跃 谷歌"
+  },
+  {
+    "path": "/gomoku.html",
+    "title": "五子棋",
+    "kw": "五子棋 棋 对弈 围棋 黑白棋 棋类"
+  },
+  {
+    "path": "/tetris.html",
+    "title": "俄罗斯方块",
+    "kw": "俄罗斯方块 方块 tetris 消除 堆叠"
+  },
+  {
+    "path": "/spire.html",
+    "title": "深渊回廊",
+    "kw": "深渊回廊 spire 地牢 迷宫 冒险 探索"
+  },
+  {
+    "path": "/function.html",
+    "title": "函数可视化",
+    "kw": "函数 可视化 数学 图表 图像 曲线"
+  },
+  {
+    "path": "/experiment.html",
+    "title": "实验性功能",
+    "kw": "实验 实验性 雪花 回到顶部 实验功能 彩蛋"
+  },
+  {
+    "path": "/download/美化包/",
+    "title": "美化包",
+    "kw": "美化包 皮肤 主题 换肤 壁纸 美化"
+  },
+  {
+    "path": "/download/其他/",
+    "title": "其他",
+    "kw": "其他 杂项 工具 备用 下载 更多"
+  }
+]
