@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>实验性功能 · 雪花与回到顶部</title>
+<link rel="icon" href="/avatar.jpg">
+<style>
+  :root {
+    --glass-alpha: 1;
+    --glass-opacity: 1;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 200vh;
+    background: #141822;
+    background-image: linear-gradient(rgba(20,24,34,0.55), rgba(20,24,34,0.85)), url("/pictures/starlight-idol-celebration-2160.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #fff;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  }
+  /* 顶部跳转栏（与全站一致） */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    height: 58px;
+    padding: 0 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.62)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.16)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    position: relative;
+    z-index: 10;
+  }
+  .nav a {
+    font-family: SimSun, "宋体", "Songti SC", serif;
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav a:hover { text-decoration: underline; }
+  .nav a.home { font-size: 22px; color: #1a6dff; }
+  @media (max-width: 820px) {
+    .nav { height: 52px; padding: 0 16px; gap: 18px; }
+    .nav a { font-size: 14px; }
+    .nav a.home { font-size: 18px; }
+  }
+  .page-head {
+    padding: 60px 24px 20px;
+    text-align: center;
+  }
+  .page-head h1 { font-size: 26px; letter-spacing: 1px; }
+  .page-head p { margin-top: 14px; color: #cbd5e1; font-size: 14px; }
+  /* 回到顶部按钮 */
+  #backTop {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+  }
+  #backTop.show { opacity: 1; pointer-events: auto; }
+  #backTop:hover { background: #2180bd; }
+  /* 雪花容器 */
+  #snowContainer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+  .snowflake {
+    position: absolute;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="home" href="/">主页</a>
+  <a href="/download">下载中心</a>
+  <a href="/games.html">小游戏中心</a>
+    <a href="/experiment.html">实验性功能</a>
+</nav>
+
+<div class="page-head">
+  <h1>实验性功能 · 雪花与回到顶部</h1>
+  <p>页面很长，向下滚动可测试"回到顶部"按钮；背景有飘落雪花。</p>
+</div>
+
+<!-- 雪花容器 -->
+<div id="snowContainer"></div>
+<!-- 回到顶部按钮 -->
+<button id="backTop">↑</button>
+
+<script>
+// ========== 原生雪花实现 ==========
+const snowContainer = document.getElementById('snowContainer');
+const flakeCount = 130;
+
+for(let i=0;i<flakeCount;i++){
+  const flake = document.createElement('div');
+  flake.classList.add('snowflake');
+
+  const size = Math.random()*5 + 2;
+  const startX = Math.random() * window.innerWidth;
+  const duration = Math.random()*7 + 6;
+  const sway = Math.random() * 80 - 40;
+
+  flake.style.width = size + 'px';
+  flake.style.height = size + 'px';
+  flake.style.opacity = Math.random()*0.5 + 0.35;
+  flake.style.left = startX + 'px';
+  flake.style.top = '-10px';
+
+  flake.animate([
+    { transform: `translate(0px,0px)` },
+    { transform: `translate(${sway}px, ${window.innerHeight+20}px)` }
+  ], {
+    duration: duration * 1000,
+    iterations: Infinity,
+    delay: Math.random() * 8000
+  });
+  snowContainer.appendChild(flake);
+}
+
+// ========== 回到顶部 ==========
+const backTopBtn = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 300) {
+    backTopBtn.classList.add('show');
+  } else {
+    backTopBtn.classList.remove('show');
+  }
+});
+backTopBtn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+
+</body>
+</html>
