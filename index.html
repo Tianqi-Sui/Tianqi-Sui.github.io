@@ -550,6 +550,7 @@
 </style>
 
 
+
 <link rel="icon" href="/avatar.jpg">
 <style id="mobile-adapt">
   .touch-pad { display: none; }
@@ -603,8 +604,13 @@
     #abCan { touch-action: none; }
     .ab-move { max-width: 360px; }
     /* 触摸控制按钮 */
-    .touch-pad { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-                 margin: 16px auto 0; width: 100%; max-width: 340px; }
+    .touch-pad { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+                 position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+                 margin: 0; width: auto; max-width: none;
+                 padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+                 background: rgba(10, 11, 17, 0.92);
+                 border-top: 1px solid rgba(255, 255, 255, 0.12);
+                 backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     .tbtn { flex: 1 1 40px; min-width: 52px; padding: 14px 0; font-size: 18px;
             border-radius: 12px; border: 1px solid rgba(255,255,255,.25); color: #fff;
             background: rgba(255,255,255,.12); touch-action: manipulation; user-select: none;
@@ -620,6 +626,7 @@
   function makePad(buttons) {
     var el = document.createElement("div");
     el.className = "touch-pad";
+    document.body.style.paddingBottom = "96px";
     buttons.forEach(function (b) {
       var btn = document.createElement("button");
       btn.type = "button";
