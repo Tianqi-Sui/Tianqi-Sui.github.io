@@ -1276,16 +1276,13 @@
 /* ===== 搜索下拉 / 设置面板：弹出动画 ===== */
 #eggSearchWrap:not([hidden]) { animation: fxPop .2s cubic-bezier(.18, .9, .3, 1.25);
   transform-origin: top center; }
-#eggSearchBox { transition: box-shadow .2s ease, transform .2s ease; }
-#eggSearchBox:focus-within { box-shadow: 0 0 0 3px rgba(26, 109, 255, .22); transform: translateY(-1px); }
 #glassPop:not([hidden]) { animation: fxPopR .22s cubic-bezier(.18, .9, .3, 1.25);
   transform-origin: top right; }
 
-/* ===== 搜索按钮：去掉后面的半透明方框 ===== */
-.eggsearch-btn { background: transparent !important; border-color: transparent !important;
-  box-shadow: none !important; }
-.eggsearch-btn:hover { background: rgba(26, 109, 255, .12) !important;
-  border-color: rgba(26, 109, 255, .28) !important; }
+/* ===== 搜索按钮：保留圆形轮廓，去掉外层方框 ===== */
+.eggsearch-btn:focus { outline: none; }
+.eggsearch-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(26, 109, 255, .28); }
+#eggSearchBox:focus-within { box-shadow: none; }
 
 /* ===== 音乐播放器：拉伸展开 ===== */
 .music-widget { transition: box-shadow .3s ease, transform .3s ease, width .3s ease; }
