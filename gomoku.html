@@ -1722,12 +1722,22 @@
 #glassPop:not([hidden]) { animation: fxPopR .22s cubic-bezier(.18, .9, .3, 1.25);
   transform-origin: top right; }
 
-/* ===== 音乐播放器：拉伸展开 / 上翻避让 ===== */
+/* ===== 搜索按钮：去掉后面的半透明方框 ===== */
+.eggsearch-btn { background: transparent !important; border-color: transparent !important;
+  box-shadow: none !important; }
+.eggsearch-btn:hover { background: rgba(26, 109, 255, .12) !important;
+  border-color: rgba(26, 109, 255, .28) !important; }
+
+/* ===== 音乐播放器：拉伸展开 ===== */
 .music-widget { transition: box-shadow .3s ease, transform .3s ease, width .3s ease; }
 .music-widget:hover { box-shadow: 0 12px 34px rgba(0, 0, 0, .35), 0 0 22px rgba(43, 214, 255, .18); }
 #musicList:not([hidden]) { animation: fxUnfold .3s cubic-bezier(.18, .9, .3, 1.1); transform-origin: top center; }
-.music-widget.mw-up #musicList { position: absolute; top: auto; bottom: calc(100% + 10px); left: 0; right: 0;
-  border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, .45); }
+
+/* ===== 搜索 / 设置：收起动画 ===== */
+.fx-closing { animation: fxClose .2s ease forwards !important; pointer-events: none !important; }
+#glassPop.fx-closing { transform-origin: top right; }
+@keyframes fxClose { from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-8px) scale(.95); } }
 
 /* ===== 彩蛋乱码层 ===== */
 #fxGlitch { position: fixed; inset: 0; z-index: 100000; display: none; background: #04060a; overflow: hidden; }
@@ -1814,19 +1824,39 @@ body.fx-hide-egg #eggOverlay, body.fx-hide-dl #eggDlOverlay { opacity: 0 !import
   watch(ov, "fx-hide-egg", 1100);
   watch(dl, "fx-hide-dl", 1300);
 
-  /* 音乐列表：靠近屏幕底部时自动上翻，避免跑出屏幕 */
+  /* 搜索 / 设置：收起动画 */
+  function watchHide(el) {
+    if (!el) { return; }
+    var closing = false;
+    new MutationObserver(function () {
+      if (closing || !el.hidden) { return; }
+      closing = true;
+      el.hidden = false;
+      el.classList.add("fx-closing");
+      setTimeout(function () {
+        el.hidden = true;
+        el.classList.remove("fx-closing");
+        setTimeout(function () { closing = false; }, 0);
+      }, 190);
+    }).observe(el, { attributes: true, attributeFilter: ["hidden"] });
+  }
+  watchHide(document.getElementById("eggSearchWrap"));
+  watchHide(document.getElementById("glassPop"));
+
+  /* 音乐列表：展开后若超出屏幕底部，把整个播放器上移，背景随之包住列表 */
   var mw = document.getElementById("musicWidget");
   var ml = document.getElementById("musicList");
   var mb = document.getElementById("navMusicBtn");
   if (mw && ml && mb) {
     function place() {
-      if (ml.hidden) { mw.classList.remove("mw-up"); return; }
+      if (ml.hidden) { return; }
       var r = mw.getBoundingClientRect();
-      var h = Math.min(ml.scrollHeight, 160);
-      if (r.bottom + h + 24 > window.innerHeight) {
-        mw.classList.add("mw-up");
-      } else {
-        mw.classList.remove("mw-up");
+      var over = r.bottom - (window.innerHeight - 12);
+      if (over > 0) {
+        var top = parseFloat(window.getComputedStyle(mw).top);
+        if (!isFinite(top)) { top = r.top; }
+        mw.style.top = Math.max(8, top - over) + "px";
+        mw.style.bottom = "auto";
       }
     }
     mb.addEventListener("click", function () { setTimeout(place, 0); });
