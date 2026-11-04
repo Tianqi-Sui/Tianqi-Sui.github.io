@@ -675,5 +675,154 @@ backTopBtn.addEventListener('click', () => {
 })();
 </script>
 
+<style id="fx-polish">
+/* ===== 导航：胶囊高亮，替换下划线 ===== */
+.nav a { position: relative; padding: 8px 16px; border-radius: 999px; text-decoration: none;
+  transition: color .2s ease, background-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.nav a:hover { text-decoration: none; color: #0b57d0; background: rgba(26, 109, 255, .12);
+  transform: translateY(-1px); box-shadow: 0 6px 18px rgba(26, 109, 255, .16); }
+.nav a.home:hover { color: #0b57d0; background: rgba(26, 109, 255, .16); }
+.nav a:active { transform: translateY(0) scale(.97); }
+.nav .nav-setting { border-radius: 50%; transition: transform .25s ease, background-color .25s ease, box-shadow .25s ease; }
+.nav .nav-setting:hover { transform: rotate(18deg) scale(1.08); background: rgba(26, 109, 255, .12);
+  box-shadow: 0 6px 16px rgba(26, 109, 255, .2); }
+.nav .nav-setting img { transition: transform .25s ease; }
+.nav .nav-setting:hover img { transform: scale(1.08); }
+
+/* ===== 主页三个按钮：明显反馈 ===== */
+.go-btn, .dl-btn, .fn-btn { position: relative; overflow: hidden;
+  transition: transform .26s cubic-bezier(.2, .8, .3, 1.15), box-shadow .26s ease, filter .26s ease,
+              color .26s ease, letter-spacing .26s ease; }
+.go-btn:hover, .dl-btn:hover, .fn-btn:hover { transform: translateY(-4px) scale(1.045);
+  filter: brightness(1.07) saturate(1.12); color: #0b57d0; letter-spacing: 2px;
+  box-shadow: 0 16px 38px rgba(26, 109, 255, .32), 0 0 0 1px rgba(26, 109, 255, .4) inset,
+              0 0 24px rgba(43, 214, 255, .35); }
+.go-btn::before, .dl-btn::before, .fn-btn::before { content: ""; position: absolute; top: 0; left: -60%;
+  width: 40%; height: 100%; pointer-events: none; transform: skewX(-20deg);
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .85), transparent);
+  transition: left .5s ease; }
+.go-btn:hover::before, .dl-btn:hover::before, .fn-btn:hover::before { left: 120%; }
+.go-btn:active, .dl-btn:active, .fn-btn:active { transform: translateY(-1px) scale(.99); }
+
+/* ===== 搜索下拉 / 设置面板：弹出动画 ===== */
+#eggSearchWrap:not([hidden]) { animation: fxPop .2s cubic-bezier(.18, .9, .3, 1.25);
+  transform-origin: top center; }
+#eggSearchBox { transition: box-shadow .2s ease, transform .2s ease; }
+#eggSearchBox:focus-within { box-shadow: 0 0 0 3px rgba(26, 109, 255, .22); transform: translateY(-1px); }
+#glassPop:not([hidden]) { animation: fxPopR .22s cubic-bezier(.18, .9, .3, 1.25);
+  transform-origin: top right; }
+
+/* ===== 音乐播放器：拉伸展开 / 上翻避让 ===== */
+.music-widget { transition: box-shadow .3s ease, transform .3s ease, width .3s ease; }
+.music-widget:hover { box-shadow: 0 12px 34px rgba(0, 0, 0, .35), 0 0 22px rgba(43, 214, 255, .18); }
+#musicList:not([hidden]) { animation: fxUnfold .3s cubic-bezier(.18, .9, .3, 1.1); transform-origin: top center; }
+.music-widget.mw-up #musicList { position: absolute; top: auto; bottom: calc(100% + 10px); left: 0; right: 0;
+  border-radius: 14px; box-shadow: 0 18px 40px rgba(0, 0, 0, .45); }
+
+/* ===== 彩蛋乱码层 ===== */
+#fxGlitch { position: fixed; inset: 0; z-index: 100000; display: none; background: #04060a; overflow: hidden; }
+#fxGlitch.on { display: block; }
+#fxGlitch .fx-scan { position: absolute; inset: -20%;
+  background: repeating-linear-gradient(0deg, rgba(0, 255, 180, .10) 0 1px, transparent 1px 3px);
+  animation: fxScan .45s linear infinite; }
+#fxGlitch .fx-rgb { position: absolute; inset: 0; mix-blend-mode: screen;
+  background: linear-gradient(90deg, rgba(255, 0, 80, .16), transparent 35%, transparent 65%, rgba(0, 200, 255, .16));
+  animation: fxShift .22s steps(2) infinite; }
+#fxGlitch .fx-code { position: absolute; inset: 0; padding: 3vh 3vw; font: 12px/1.35 Consolas, monospace;
+  color: #39ffb0; opacity: .8; white-space: pre-wrap; word-break: break-all;
+  text-shadow: 0 0 6px rgba(57, 255, 176, .6); }
+#fxGlitch .fx-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font: 700 clamp(28px, 7vw, 64px)/1.1 "Microsoft YaHei", sans-serif; letter-spacing: .18em;
+  color: #ff2d75; text-shadow: 3px 0 #00e5ff, -3px 0 #00ff9d; opacity: .92;
+  animation: fxTitle .18s steps(2) infinite; white-space: nowrap; }
+@keyframes fxPop { from { opacity: 0; transform: translateY(-8px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes fxPopR { from { opacity: 0; transform: translateY(-10px) scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes fxUnfold { from { opacity: 0; transform: scaleY(.6) translateY(-8px); max-height: 0; }
+  to { opacity: 1; transform: none; max-height: 160px; } }
+@keyframes fxScan { from { transform: translateY(0); } to { transform: translateY(40px); } }
+@keyframes fxShift { 0% { transform: translateX(-6px); } 50% { transform: translateX(5px); } 100% { transform: translateX(-2px); } }
+@keyframes fxTitle { 0% { transform: translate(-50%, -50%) skewX(0); }
+  50% { transform: translate(calc(-50% + 3px), -50%) skewX(-3deg); }
+  100% { transform: translate(-50%, -50%) skewX(2deg); } }
+body.fx-hide-egg #eggOverlay, body.fx-hide-dl #eggDlOverlay { opacity: 0 !important; pointer-events: none !important; }
+#eggOverlay, #eggDlOverlay { transition: opacity .2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  #fxGlitch .fx-scan, #fxGlitch .fx-rgb, #fxGlitch .fx-title { animation: none; }
+}
+</style>
+<script id="fx-polish-js">
+(function () {
+  "use strict";
+  var ov = document.getElementById("eggOverlay");
+  var dl = document.getElementById("eggDlOverlay");
+  if (!ov && !dl) return;
+
+  var gl = document.createElement("div");
+  gl.id = "fxGlitch";
+  gl.innerHTML = '<div class="fx-scan"></div><div class="fx-rgb"></div>' +
+                 '<div class="fx-code"></div><div class="fx-title">SYSTEM BREACH</div>';
+  document.body.appendChild(gl);
+  var codeEl = gl.querySelector(".fx-code");
+  var timer = null;
+  var busy = false;
+
+  function randCode() {
+    var chars = "01ABCDEF#$%&@!?<>/|=+*{}[]";
+    var out = "";
+    for (var i = 0; i < 1400; i++) {
+      out += chars.charAt(Math.floor(Math.random() * chars.length));
+      if (i % 72 === 71) { out += "\n"; }
+    }
+    return out;
+  }
+  function paint() { codeEl.textContent = randCode(); }
+
+  function glitch(ms, done) {
+    paint();
+    gl.classList.add("on");
+    timer = setInterval(paint, 70);
+    setTimeout(function () {
+      clearInterval(timer);
+      timer = null;
+      gl.classList.remove("on");
+      if (done) { done(); }
+    }, ms);
+  }
+
+  function watch(el, hideClass, ms) {
+    if (!el) { return; }
+    new MutationObserver(function () {
+      if (busy || !el.classList.contains("on")) { return; }
+      busy = true;
+      document.body.classList.add(hideClass);
+      glitch(ms, function () {
+        document.body.classList.remove(hideClass);
+        busy = false;
+      });
+    }).observe(el, { attributes: true, attributeFilter: ["class"] });
+  }
+  watch(ov, "fx-hide-egg", 1100);
+  watch(dl, "fx-hide-dl", 1300);
+
+  /* 音乐列表：靠近屏幕底部时自动上翻，避免跑出屏幕 */
+  var mw = document.getElementById("musicWidget");
+  var ml = document.getElementById("musicList");
+  var mb = document.getElementById("navMusicBtn");
+  if (mw && ml && mb) {
+    function place() {
+      if (ml.hidden) { mw.classList.remove("mw-up"); return; }
+      var r = mw.getBoundingClientRect();
+      var h = Math.min(ml.scrollHeight, 160);
+      if (r.bottom + h + 24 > window.innerHeight) {
+        mw.classList.add("mw-up");
+      } else {
+        mw.classList.remove("mw-up");
+      }
+    }
+    mb.addEventListener("click", function () { setTimeout(place, 0); });
+    window.addEventListener("resize", function () { if (!ml.hidden) { place(); } });
+  }
+})();
+</script>
 </body>
 </html>
