@@ -53,5 +53,15 @@
     "path": "/download/其他/",
     "title": "其他",
     "kw": "其他 杂项 工具 备用 下载 更多"
+  },
+  {
+    "path": "/rice.html",
+    "title": "Rice++ 新手引导",
+    "kw": "Rice++ rice 小饭堂 服务器 新手引导 指挥架构 玩家文档 哈基狼"
+  },
+  {
+    "path": "/gift.html",
+    "title": "哈基狼的馈赠",
+    "kw": "哈基狼 馈赠 启动参数 heapsize maxmem novid nopreload 步骤 Rice++"
   }
 ]
