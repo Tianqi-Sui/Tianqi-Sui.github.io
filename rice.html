@@ -755,11 +755,12 @@
   }
   .rice-cols {
     display: flex;
+    flex-wrap: wrap;
     gap: 22px;
     align-items: stretch;
   }
   .rice-card {
-    flex: 1;
+    flex: 0 0 calc((100% - 44px) / 3);
     min-height: 50vh;
     display: flex;
     flex-direction: column;
@@ -1316,6 +1317,11 @@
       <div class="rice-preview">哈基狼的馈赠</div>
       <div class="rice-desc">来自哈基狼的焚绝，进不去服的小萌新特别推荐使用🔥</div>
       <div class="rice-hint">点击进入 · 查看启动参数与步骤</div>
+    </a>
+    <a class="rice-card" href="/map.html">
+      <div class="rice-preview">地图</div>
+      <div class="rice-desc">rice的地图</div>
+      <div class="rice-hint">点击查看大图 · 左键拖动 · 滚轮缩放</div>
     </a>
   </div>
 </main>
