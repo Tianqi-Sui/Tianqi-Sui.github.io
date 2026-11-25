@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>世界尽头的游客 · AI小说</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, sans-serif;
+    color: #e7e7ef;
+    background-color: #0f0f16;
+    background-image: url("/pictures/pastel-dessert-table-2160.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 9, 14, calc(var(--glass-alpha) * 0.72));
+    pointer-events: none;
+    z-index: 0;
+  }
+    /* 全站液态玻璃统一变量（设置面板滑块实时驱动） */
+  :root {
+    --glass-alpha: 1; /* 亮度：玻璃底色浓淡乘数 0.25~1，作用与历史版本一致 */
+    --glass-opacity: 1; /* 不透明度：0~1。0 时玻璃背景/模糊/边框完全透明可透过后方图片，1 时与默认一致 */
+  }
+  /* 顶部跳转栏 */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    height: 58px;
+    padding: 0 48px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.62)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border-bottom: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.16)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    position: relative;
+    z-index: 10;
+  }
+  .nav a {
+    font-family: SimSun, "宋体", "Songti SC", serif;
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+    line-height: 1;
+  }
+  .nav a:hover { text-decoration: underline; }
+  .nav a.home {
+    font-size: 22px;
+    color: #1a6dff;
+  }
+  .nav-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav .nav-setting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 50%;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.34)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.14)));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    cursor: pointer;
+  }
+  .nav .nav-setting img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .nav .nav-setting:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.24)));
+  }
+  .music-widget .nav-music {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    padding: 2px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 12px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.5)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .nav-music .nm-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2bd6ff, #ff5fa8);
+  }
+  .music-widget .nav-music img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .nav-music:hover {
+    transform: scale(1.06);
+  }
+  .glass-pop {
+    position: absolute;
+    top: 66px;
+    right: 16px;
+    width: 320px;
+    padding: 16px 18px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.78)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.46)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 20px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.42));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.24)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 999;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+  }
+  .glass-pop[hidden] { display: none; }
+  /* 音乐播放器独立浮动组件：默认固定于页面左下角，可鼠标拖动（刷新回默认位） */
+  .music-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 300px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.80)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.50)));
+    backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-opacity) * 18px)) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: 0 12px 32px rgba(0, 0, 0, calc(var(--glass-alpha) * 0.22)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    z-index: 998;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    color: #111111;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: move;
+  }
+  .music-widget .mw-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .music-widget .mw-playbtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    box-shadow: 0 0 8px rgba(43, 214, 255, calc(var(--glass-alpha) * 0.45)), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+  }
+  .music-widget .mw-playbtn[hidden] { display: none; }
+  .music-widget .mw-playbtn img {
+    width: 16px;
+    height: 16px;
+    display: block;
+    pointer-events: none;
+  }
+  .music-widget .mw-playbtn:hover {
+    transform: scale(1.08);
+  }
+  .music-widget .mw-now {
+    flex: 1;
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.8);
+    min-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* 播放旋转：内芯持续旋转，播放时 running / 暂停时 paused（保持角度，平滑过渡） */
+  @keyframes mw-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .music-widget .nav-music .nm-inner {
+    animation: mw-spin 2.4s linear infinite;
+    animation-play-state: paused;
+  }
+  .music-widget .nav-music.mw-playing .nm-inner {
+    animation-play-state: running;
+  }
+  .mw-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .mw-time {
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.75);
+    min-width: 34px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  #musicSeek {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #ff5fa8, #2bd6ff);
+    outline: none;
+    cursor: pointer;
+  }
+  #musicSeek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
+  }
+  #musicSeek::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff5fa8, #2bd6ff);
+    cursor: pointer;
+  }
+  .mw-list {
+    max-height: 160px;
+    overflow-y: auto;
+  }
+  .music-widget .mw-list[hidden] { display: none; }
+  .mw-note {
+    margin-top: 6px;
+    font-size: 11px;
+    color: rgba(17, 17, 17, 0.6);
+  }
+  .gp-head {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .gp-row {
+    margin-bottom: 12px;
+  }
+  .gp-label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  .gp-row input[type="range"] {
+    width: 100%;
+    accent-color: #1a6dff;
+    vertical-align: middle;
+  }
+  .gp-val {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 40px;
+  }
+  .gp-bglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .bg-opt {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.55));
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.3));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+    color: #ffffff;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bg-opt:hover {
+    background: linear-gradient(135deg, rgba(138, 92, 255, 0.9), rgba(138, 92, 255, 0.4));
+  }
+  .bg-opt.active {
+    border-color: rgba(255, 255, 255, calc(var(--glass-alpha) * 0.95));
+    background: linear-gradient(135deg, rgba(138, 92, 255, 1), rgba(138, 92, 255, 0.5));
+    box-shadow: 0 0 14px rgba(138, 92, 255, calc(var(--glass-alpha) * 0.7)), inset 0 1px 0 rgba(255, 255, 255, calc(var(--glass-alpha) * 0.5));
+  }
+  .gp-empty {
+    font-size: 13px;
+    color: rgba(17, 17, 17, 0.7);
+    padding: 4px 2px;
+  }
+  .gp-note {
+    font-size: 12px;
+    color: rgba(17, 17, 17, 0.65);
+  }
+  /* 全站自定义光标：m-1 默认箭头（text 目录本地资源，零外链） */
+  body {
+    cursor: url('/text/m-1.png') 0 0, auto;
+  }
+  /* m-2 手型：所有可点击元素（含各页面 .dl-btn/.plot-btn/.seg-btn/tr.row/棋盘等） */
+  a, button, .bg-opt, .nav-setting, .dl-btn, .plot-btn, .seg-btn, tr.row,
+  .board-area canvas, [role="button"], [onclick], select, summary, label,
+  input[type="submit"], input[type="radio"], input[type="checkbox"], input[type="file"] {
+    cursor: url('/text/m-2.png') 0 0, pointer !important;
+  }
+  /* 全站液态玻璃滚动条：轨道玻璃半透明、滑块粉色 100% -> 30% 渐变、圆角+内高光，hover 加深 */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.30)), rgba(255, 255, 255, calc(var(--glass-alpha) * var(--glass-opacity) * 0.12)));
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 1), rgba(255, 105, 180, 0.3));
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, calc(var(--glass-alpha) * 0.45));
+    box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.35);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(255, 105, 180, 0.95), rgba(255, 105, 180, 0.5));
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+
+  .music-widget { display: none !important; }
+
+  .nov-main { position: relative; z-index: 1; flex: 1; min-height: 0; display: flex; flex-direction: column;
+    width: min(880px, 100%); margin: 0 auto; padding: 6px 0 calc(8px + env(safe-area-inset-bottom)); }
+
+  .nov-head { flex: none; display: flex; align-items: center; gap: 10px; padding: 10px 14px 8px; }
+  .nov-back { flex: none; display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 14px;
+    border-radius: 999px; font-size: 13px; text-decoration: none; color: #fbe3ef;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); }
+  .nov-back:active { transform: scale(0.97); }
+  .nov-titlebox { flex: 1; min-width: 0; text-align: center; }
+  .nov-title { margin: 0; font-size: 15px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nov-vol { margin-top: 2px; font-size: 11.5px; color: rgba(255, 255, 255, 0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nov-toc-btn { flex: none; height: 36px; padding: 0 14px; border-radius: 999px; font-size: 13px; cursor: pointer;
+    color: #fbe3ef; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); }
+
+  .nov-bar { flex: none; height: 2px; margin: 0 14px 8px; border-radius: 2px; background: rgba(255, 255, 255, 0.09); overflow: hidden; }
+  .nov-bar i { display: block; height: 100%; width: 0; border-radius: 2px;
+    background: linear-gradient(90deg, rgba(255, 130, 195, 0.95), rgba(170, 140, 255, 0.9)); transition: width 0.3s ease; }
+
+  .nov-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; margin: 0 12px;
+    border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(10, 11, 18, 0.66);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  .nov-page { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+    padding: 24px clamp(18px, 4vw, 42px) 32px;
+    background: linear-gradient(180deg, rgba(16, 18, 28, 0.97), rgba(11, 12, 20, 0.97));
+    box-shadow: -18px 0 32px rgba(0, 0, 0, 0.42);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 105, 180, 0.45) #12141d;
+    will-change: transform;
+    transition: transform 0.28s cubic-bezier(0.25, 0.8, 0.35, 1); }
+  .nov-page::-webkit-scrollbar { width: 8px; }
+  .nov-page::-webkit-scrollbar-track { background: #12141d; }
+  .nov-page::-webkit-scrollbar-thumb { background: rgba(255, 105, 180, 0.45); border-radius: 6px; border: 2px solid #12141d; }
+  .nov-ch-title { margin: 0 0 6px; font-size: 17px; font-weight: 700; letter-spacing: 0.5px; color: #ffd7ea; }
+  .nov-ch-title::after { content: ""; display: block; width: 42px; height: 2px; margin-top: 12px;
+    background: linear-gradient(90deg, rgba(255, 130, 195, 0.9), rgba(255, 130, 195, 0)); }
+  .nov-ch-body { font-size: clamp(15px, 0.55vw + 11.6px, 17.5px); line-height: 1.95; color: #ece9f2; }
+  .nov-ch-body p { margin: 0 0 0.95em; text-align: justify; text-indent: 2em; }
+  .nov-ch-body p:first-of-type { margin-top: 1.4em; }
+  .nov-ch-body h2, .nov-ch-body h3 { margin: 1.4em 0 0.6em; font-size: 1.05em; color: #ffd7ea; }
+  .nov-ch-body blockquote { margin: 1.1em 0; padding: 8px 16px; border-left: 3px solid rgba(255, 130, 195, 0.55);
+    background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.8); }
+  .nov-ch-body .n { display: none; }
+  .nov-ch-body img { max-width: 100%; height: auto; border-radius: 10px; }
+
+  .nov-nav { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px 2px; }
+  .nov-nav button { min-height: 44px; padding: 0 18px; border-radius: 999px; font-size: 14px; cursor: pointer;
+    color: #fff; background: rgba(255, 255, 255, 0.11); border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: background 0.18s ease, opacity 0.18s ease, transform 0.12s ease; }
+  .nov-nav button:hover { background: rgba(255, 130, 195, 0.24); border-color: rgba(255, 158, 203, 0.5); }
+  .nov-nav button:active { transform: scale(0.97); }
+  .nov-nav button:disabled { opacity: 0.32; cursor: default; }
+  .nov-progress { font-size: 12.5px; letter-spacing: 1px; color: rgba(255, 255, 255, 0.62); }
+
+  /* 目录抽屉（覆盖在阅读区域内，纯绝对定位，避免合成层异常） */
+  .nov-main { position: relative; }
+  .nov-toc { position: absolute; inset: 0; z-index: 9; display: none; align-items: center; justify-content: center;
+    padding: 10px; background: rgba(6, 7, 12, 0.72); border-radius: 18px; }
+  .nov-toc.on { display: flex; }
+  .nov-toc-panel { width: min(560px, 100%); max-height: min(78%, 520px); display: flex; flex-direction: column;
+    border-radius: 16px; background: #13141d; border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5); overflow: hidden; }
+  .nov-toc-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 10px; }
+  .nov-toc-head strong { font-size: 15px; color: #fff; }
+  .nov-toc-close { width: 34px; height: 34px; border-radius: 50%; font-size: 15px; cursor: pointer;
+    color: #fff; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); }
+  .nov-toc-list { flex: 1; min-height: 0; overflow-y: auto; padding: 0 14px 18px; }
+  .nov-toc-vol { margin: 12px 4px 8px; font-size: 12.5px; letter-spacing: 1.5px; color: rgba(255, 160, 205, 0.9); }
+  .nov-toc-item { display: block; width: 100%; text-align: left; padding: 11px 12px; margin-bottom: 6px; border-radius: 10px;
+    font-size: 13.5px; color: rgba(255, 255, 255, 0.82); background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.09); cursor: pointer; }
+  .nov-toc-item.on { color: #fff; background: rgba(255, 130, 195, 0.2); border-color: rgba(255, 158, 203, 0.45); }
+
+  @media (max-width: 820px) {
+    .nov-head { padding: 8px 10px 6px; gap: 8px; }
+    .nov-title { font-size: 14px; }
+    .nov-back, .nov-toc-btn { height: 34px; padding: 0 11px; font-size: 12.5px; }
+    .nov-stage { margin: 0 8px; border-radius: 14px; }
+    .nov-page { padding: 18px 16px 26px; }
+    .nov-nav { padding: 8px 10px 0; gap: 8px; }
+    .nov-nav button { padding: 0 14px; font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nov-page { transition: none !important; }
+    .nov-bar i { transition: none; }
+  }
+</style>
+</head>
+<body>
+    <style id="site-sync">
+  /* ===== 移动端适配：游戏画布缩放、触摸板、播放器收起、页面布局（同步 ghpages） ===== */
+  .touch-pad { display: none; }
+  .mw-toggle { display: none; }
+  @media (max-width: 820px) {
+    .nav { height: 52px; padding: 0 16px; gap: 18px; }
+    .nav a { font-size: 14px; }
+    .nav a.home { font-size: 18px; }
+    .nav .nav-setting { width: 30px; height: 30px; }
+    .nav .nav-setting img { width: 16px; height: 16px; }
+    body { background-attachment: scroll; }
+    #game, #goban, #abCan, #boardCan { max-width: 100%; height: auto; }
+    .glass-pop { width: auto; max-width: none; left: 16px; right: 16px; }
+    .music-widget { width: calc(100vw - 24px); max-width: 300px; left: 12px; bottom: 12px; }
+    .music-widget.mw-collapsed { position: fixed; top: 58px; left: 12px; bottom: auto;
+                                 width: auto; min-width: 0; max-width: none; padding: 6px 8px; }
+    .music-widget.mw-collapsed .mw-progress,
+    .music-widget.mw-collapsed .mw-note,
+    .music-widget.mw-collapsed .mw-list,
+    .music-widget.mw-collapsed .mw-now,
+    .music-widget.mw-collapsed .mw-playbtn { display: none; }
+    .mw-toggle { display: flex; align-items: center; justify-content: center; flex: none;
+                 width: 24px; height: 24px; padding: 0; border: none; border-radius: 50%;
+                 background: rgba(0,0,0,.14); color: #111; font-size: 13px; cursor: pointer; }
+    .stage { flex-direction: column; align-items: center; justify-content: flex-start;
+             padding: 26px 16px 110px; overflow: visible; gap: 26px; }
+    .column { width: 100%; max-width: 350px; }
+    .card-bili, .card-dl, .card-fn { width: 100%; height: auto; min-height: 280px; }
+    .wrap { padding: 26px 14px 90px; }
+    .games { gap: 12px; }
+    .game-card { width: calc(50% - 6px); height: auto; min-height: 132px; padding: 14px 8px; }
+    .wrap .panel { padding: 18px 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { min-width: 460px; font-size: 13px; }
+    .col-size { width: 92px; }
+    .col-time { width: 110px; }
+    .game-shell { flex-direction: column; align-items: center; gap: 18px; padding: 20px 14px; }
+    .game-shell .panel { width: 100%; max-width: 540px; }
+    .board-area { margin-left: 0; width: 100%; }
+    .t-wrap { flex-direction: column; align-items: center; gap: 14px; padding: 14px 10px 40px; }
+    .t-side { width: 100%; max-width: 320px; min-width: 0; flex-direction: row;
+              flex-wrap: wrap; justify-content: center; }
+    .t-side .t-panel { flex: 1 1 140px; }
+    #abCan { touch-action: none; }
+    .ab-move { max-width: 360px; }
+    .touch-pad { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+                 position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+                 margin: 0; width: auto; max-width: none;
+                 padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+                 background: rgba(10, 11, 17, 0.92);
+                 border-top: 1px solid rgba(255, 255, 255, 0.12);
+                 backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .tbtn { flex: 1 1 40px; min-width: 52px; padding: 14px 0; font-size: 18px;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,.25); color: #fff;
+            background: rgba(255,255,255,.12); touch-action: manipulation; user-select: none;
+            -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+    .tbtn:active { background: rgba(56,189,248,.55); }
+  }
+  @media (max-width: 380px) { .game-card { width: 100%; } }
+
+  /* ===== 隐藏彩蛋：隐秘入口 + 模拟下载中心（同步 ghpages） ===== */
+  #eggOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  #eggOverlay.on{display:flex}
+  #eggGlass{background:linear-gradient(145deg,rgba(255,255,255,.85),rgba(255,255,255,.55));backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);border:1px solid rgba(255,255,255,.5);border-radius:18px;box-shadow:0 16px 40px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.6);padding:28px 30px;width:340px;max-width:88vw;text-align:center;color:#111;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  #eggGlass h3{margin:0 0 6px;font-weight:600;font-size:18px}
+  #eggGlass .egg-hint{font-size:12px;color:#666;margin-bottom:16px}
+  #eggGlass input{width:100%;padding:10px 12px;border:1px solid rgba(17,17,17,.15);border-radius:10px;background:rgba(255,255,255,.6);font-size:14px;box-sizing:border-box;outline:none;color:#111}
+  #eggGlass input:focus{border-color:#8a5cff;box-shadow:0 0 0 3px rgba(138,92,255,.18)}
+  #eggGlass .egg-err{color:#e53935;font-size:12px;min-height:16px;margin-top:6px}
+  #eggGlass .egg-btn{margin-top:14px;width:100%;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#8a5cff,#6a3fd8);color:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+  #eggGlass .egg-btn:hover{filter:brightness(1.08)}
+  #eggDlOverlay{position:fixed;inset:0;z-index:99998;display:none;flex-direction:column;background:rgba(20,24,34,.62);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);color:#fff;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+  #eggDlOverlay.on{display:flex}
+  #eggDlHead{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.15);background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.05))}
+  #eggDlHead h2{margin:0;font-size:18px;font-weight:600}
+  #eggDlBack{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:9px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+  #eggDlBack:hover{background:rgba(255,255,255,.26)}
+  #eggDlBody{flex:1;overflow:auto;padding:18px 22px}
+  #eggDlTable{width:100%;border-collapse:collapse;font-size:14px}
+  #eggDlTable th,#eggDlTable td{padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.12);vertical-align:middle}
+  #eggDlTable th{color:#cfd6e4;font-weight:500;position:sticky;top:0;background:rgba(30,34,46,.9)}
+  #eggDlEmpty{color:#9aa7bd;font-size:13px;padding:30px;text-align:center;display:none}
+  .egg-name{word-break:break-all}
+  .egg-dl-btn{background:linear-gradient(135deg,#8a5cff,#6a3fd8);border:none;color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;text-decoration:none;display:inline-block}
+  .egg-dl-btn:hover{filter:brightness(1.08)}
+  @media (max-width:820px){
+    #eggDlHead{padding:12px 14px}
+    #eggDlBody{padding:12px 10px}
+    #eggDlTable{font-size:13px}
+    #eggDlTable th,#eggDlTable td{padding:8px 8px}
+  }
+
+  /* ===== 导航栏搜索框 v3（同步 ghpages） ===== */
+  .eggsearch{ display:flex; align-items:center; margin-right:8px; }
+  .eggsearch-btn{
+    flex:none; display:flex; align-items:center; justify-content:center;
+    width:34px; height:34px; padding:0;
+    border:1px solid rgba(255,255,255, calc(var(--glass-alpha,1)*0.55)); border-radius:50%;
+    background:linear-gradient(145deg, rgba(255,255,255, calc(var(--glass-alpha,1)*var(--glass-opacity,1)*0.34)), rgba(255,255,255, calc(var(--glass-alpha,1)*var(--glass-opacity,1)*0.14)));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.5); cursor:pointer;
+    transition:transform .4s cubic-bezier(.4,0,.2,1);
+  }
+  .eggsearch-btn:hover{ background:linear-gradient(145deg,rgba(255,255,255,0.5),rgba(255,255,255,0.24)); }
+  .eggsearch-btn svg{ width:18px; height:18px; display:block; pointer-events:none; }
+  .eggsearch-input{
+    width:0; height:34px; padding:0; box-sizing:border-box;
+    border:1px solid transparent; border-radius:18px; background:rgba(255,255,255,0.78);
+    font-size:14px; color:#111; outline:none; opacity:0; overflow:hidden;
+    transition:width .4s cubic-bezier(.4,0,.2,1), opacity .2s, padding .4s, border-color .2s;
+  }
+  .eggsearch.active .eggsearch-btn{ transform:translateX(-12px); }
+  .eggsearch.active .eggsearch-input{ width:200px; padding:0 12px; opacity:1; border-color:rgba(17,17,17,0.2); }
+  .eggsearch.active .eggsearch-input:focus{ border-color:#8a5cff; box-shadow:0 0 0 3px rgba(138,92,255,0.18); }
+  #eggSearchWrap{
+    position:fixed; top:66px; right:16px; width:360px; max-width:calc(100vw - 32px);
+    z-index:99990; padding:10px;
+    background:linear-gradient(145deg,rgba(255,255,255,0.9),rgba(255,255,255,0.62));
+    backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%);
+    border:1px solid rgba(255,255,255,0.5); border-radius:14px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.6);
+    color:#111; font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif; box-sizing:border-box;
+  }
+  #eggSearchWrap[hidden]{ display:none; }
+  #eggSearchResults{ max-height:280px; overflow:auto; }
+  #eggSearchResults a{ display:block; padding:8px 10px; border-radius:8px; text-decoration:none; color:#111; font-size:13px; }
+  #eggSearchResults a:hover{ background:rgba(138,92,255,0.15); }
+  #eggSearchResults a .eggsearch-path{ color:#666; font-size:12px; margin-left:6px; }
+  #eggSearchResults .eggsearch-none{ padding:8px 10px; color:#888; font-size:13px; }
+  #eggSearchEdge{ margin-top:6px; border-top:1px solid rgba(17,17,17,0.12); padding:8px 4px 2px; color:#1a6dff; font-size:13px; cursor:pointer; }
+  #eggSearchEdge:hover{ text-decoration:underline; }
+  @media (max-width:820px){
+    .eggsearch.active .eggsearch-btn{ transform:translateX(-8px); }
+    .eggsearch.active .eggsearch-input{ width:130px; padding:0 10px; }
+    #eggSearchWrap{ top:58px; right:16px; left:auto; width:360px; max-width:calc(100vw - 32px); }
+  }
+
+  /* ===== 全站动效升级（同步 ghpages fx-polish） ===== */
+  .nav a { position: relative; padding: 8px 16px; border-radius: 999px; text-decoration: none;
+    transition: color .2s ease, background-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+  .nav a:hover { text-decoration: none; color: #0b57d0; background: rgba(26, 109, 255, .12);
+    transform: translateY(-1px); box-shadow: 0 6px 18px rgba(26, 109, 255, .16); }
+  .nav a.home:hover { color: #0b57d0; background: rgba(26, 109, 255, .16); }
+  .nav a:active { transform: translateY(0) scale(.97); }
+  .nav .nav-setting { border-radius: 50%; transition: transform .25s ease, background-color .25s ease, box-shadow .25s ease; }
+  .nav .nav-setting:hover { transform: rotate(18deg) scale(1.08); background: rgba(26, 109, 255, .12);
+    box-shadow: 0 6px 16px rgba(26, 109, 255, .2); }
+  .nav .nav-setting img { transition: transform .25s ease; }
+  .nav .nav-setting:hover img { transform: scale(1.08); }
+  .go-btn, .dl-btn, .fn-btn { position: relative; overflow: hidden;
+    transition: transform .26s cubic-bezier(.2, .8, .3, 1.15), box-shadow .26s ease, filter .26s ease,
+                color .26s ease, letter-spacing .26s ease; }
+  .go-btn:hover, .dl-btn:hover, .fn-btn:hover { transform: translateY(-4px) scale(1.045);
+    filter: brightness(1.07) saturate(1.12); color: #0b57d0; letter-spacing: 2px;
+    box-shadow: 0 16px 38px rgba(26, 109, 255, .32), 0 0 0 1px rgba(26, 109, 255, .4) inset,
+                0 0 24px rgba(43, 214, 255, .35); }
+  .go-btn::before, .dl-btn::before, .fn-btn::before { content: ""; position: absolute; top: 0; left: -60%;
+    width: 40%; height: 100%; pointer-events: none; transform: skewX(-20deg);
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .85), transparent);
+    transition: left .5s ease; }
+  .go-btn:hover::before, .dl-btn:hover::before, .fn-btn:hover::before { left: 120%; }
+  .go-btn:active, .dl-btn:active, .fn-btn:active { transform: translateY(-1px) scale(.99); }
+  #eggSearchWrap:not([hidden]) { animation: fxPop .2s cubic-bezier(.18, .9, .3, 1.25);
+    transform-origin: top center; }
+  #glassPop:not([hidden]) { animation: fxPopR .22s cubic-bezier(.18, .9, .3, 1.25);
+    transform-origin: top right; }
+  .eggsearch-btn:focus { outline: none; }
+  .eggsearch-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(26, 109, 255, .28); }
+  #eggSearchBox:focus-within { box-shadow: none; }
+  .music-widget { transition: box-shadow .3s ease, transform .3s ease, width .3s ease; }
+  .music-widget:hover { box-shadow: 0 12px 34px rgba(0, 0, 0, .35), 0 0 22px rgba(43, 214, 255, .18); }
+  #musicList:not([hidden]) { animation: fxUnfold .3s cubic-bezier(.18, .9, .3, 1.1); transform-origin: top center; }
+  .fx-closing { animation: fxClose .2s ease forwards !important; pointer-events: none !important; }
+  #glassPop.fx-closing { transform-origin: top right; }
+  @keyframes fxClose { from { opacity: 1; transform: none; }
+    to { opacity: 0; transform: translateY(-8px) scale(.95); } }
+  #fxGlitch { position: fixed; inset: 0; z-index: 100000; display: none; background: #04060a; overflow: hidden; }
+  #fxGlitch.on { display: block; }
+  #fxGlitch .fx-scan { position: absolute; inset: -20%;
+    background: repeating-linear-gradient(0deg, rgba(0, 255, 180, .10) 0 1px, transparent 1px 3px);
+    animation: fxScan .45s linear infinite; }
+  #fxGlitch .fx-rgb { position: absolute; inset: 0; mix-blend-mode: screen;
+    background: linear-gradient(90deg, rgba(255, 0, 80, .16), transparent 35%, transparent 65%, rgba(0, 200, 255, .16));
+    animation: fxShift .22s steps(2) infinite; }
+  #fxGlitch .fx-code { position: absolute; inset: 0; padding: 3vh 3vw; font: 12px/1.35 Consolas, monospace;
+    color: #39ffb0; opacity: .8; white-space: pre-wrap; word-break: break-all;
+    text-shadow: 0 0 6px rgba(57, 255, 176, .6); }
+  #fxGlitch .fx-title { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font: 700 clamp(28px, 7vw, 64px)/1.1 "Microsoft YaHei", sans-serif; letter-spacing: .18em;
+    color: #ff2d75; text-shadow: 3px 0 #00e5ff, -3px 0 #00ff9d; opacity: .92;
+    animation: fxTitle .18s steps(2) infinite; white-space: nowrap; }
+  @keyframes fxPop { from { opacity: 0; transform: translateY(-8px) scale(.94); } to { opacity: 1; transform: none; } }
+  @keyframes fxPopR { from { opacity: 0; transform: translateY(-10px) scale(.92); } to { opacity: 1; transform: none; } }
+  @keyframes fxUnfold { from { opacity: 0; transform: scaleY(.6) translateY(-8px); max-height: 0; }
+    to { opacity: 1; transform: none; max-height: 160px; } }
+  @keyframes fxScan { from { transform: translateY(0); } to { transform: translateY(40px); } }
+  @keyframes fxShift { 0% { transform: translateX(-6px); } 50% { transform: translateX(5px); } 100% { transform: translateX(-2px); } }
+  @keyframes fxTitle { 0% { transform: translate(-50%, -50%) skewX(0); }
+    50% { transform: translate(calc(-50% + 3px), -50%) skewX(-3deg); }
+    100% { transform: translate(-50%, -50%) skewX(2deg); } }
+  body.fx-hide-egg #eggOverlay, body.fx-hide-dl #eggDlOverlay { opacity: 0 !important; pointer-events: none !important; }
+  #eggOverlay, #eggDlOverlay { transition: opacity .2s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    #fxGlitch .fx-scan, #fxGlitch .fx-rgb, #fxGlitch .fx-title { animation: none; }
+  }
+  </style>
+  <nav class="nav">
+    <a class="home" href="/">主页</a>
+    <a href="/novels.html">AI小说</a>
+    <a href="/download">下载中心</a>
+    <a href="/rice.html">Rice++</a>
+    <a href="/games.html">小游戏中心</a>
+    <a href="/experiment.html">实验性功能</a>
+    <div class="nav-actions">
+      <div class="eggsearch" id="eggSearchBox">
+        <button type="button" class="eggsearch-btn" id="eggSearchBtn" title="搜索">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <input class="eggsearch-input" id="eggSearchInput" type="text" placeholder="搜索站内页面…" autocomplete="off">
+      </div>
+      <button type="button" class="nav-setting" id="navSettingBtn" title="设置">
+        <img src="/text/setting.png" alt="设置">
+      </button>
+    </div>
+  </nav>
+  <div class="music-widget" id="musicWidget" title="可拖动，刷新回到默认位置">
+    <div class="mw-head">
+      <button type="button" class="nav-music" id="navMusicBtn" title="展开/收起曲目列表" aria-label="音乐播放器">
+        <span class="nm-inner"><img src="/text/music.png" alt="音乐"></span>
+      </button>
+      <div class="mw-now" id="musicNow">未播放</div>
+      <button type="button" class="mw-playbtn" id="musicPlayBtn" title="播放/暂停" aria-label="播放/暂停" hidden>
+        <img id="musicPlayImg" src="/text/play.png" alt="播放/暂停">
+      </button>
+    </div>
+    <div class="mw-progress">
+      <span class="mw-time" id="musicCur">0:00</span>
+      <input type="range" id="musicSeek" min="0" max="1000" value="0" step="1" aria-label="播放进度">
+      <span class="mw-time" id="musicDur">0:00</span>
+    </div>
+    <div class="gp-bglist mw-list" id="musicList" hidden>
+      
+    </div>
+    <div class="mw-note">点击曲目播放，再次点击同一曲目暂停/继续；拖动进度条可跳转</div>
+  </div>
+  <div class="glass-pop" id="glassPop" hidden>
+    <div class="gp-head">站点设置</div>
+    <div class="gp-row">
+      <span class="gp-label">亮度</span>
+      <input type="range" id="glassAlpha" min="25" max="100" value="100" step="1">
+      <span class="gp-val" id="glassAlphaVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">不透明度</span>
+      <input type="range" id="glassOpacity" min="0" max="100" value="100" step="1">
+      <span class="gp-val" id="glassOpacityVal">100%</span>
+    </div>
+    <div class="gp-row">
+      <span class="gp-label">背景图片（C:\Thome\Pictures）</span>
+      <div class="gp-bglist" id="bgList">
+        <button type="button" class="bg-opt" data-bg="/pictures/fragmented-pink-haired-pilot-2160.png">fragmented-pink-haired-pilot-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/holiday-morning-glow-2160.png">holiday-morning-glow-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-grid-descent-2160.png">neon-grid-descent-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/neon-tower-runner-2160.png">neon-tower-runner-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pastel-dessert-table-2160.png">pastel-dessert-table-2160.png</button>
+<button type="button" class="bg-opt" data-bg="/pictures/pink-haired-girl-and-plushies-2160.jpg">pink-haired-girl-and-plushies-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-idol-celebration-2160.jpg">starlight-idol-celebration-2160.jpg</button>
+<button type="button" class="bg-opt" data-bg="/pictures/starlight-reverie-2160.jpg">starlight-reverie-2160.jpg</button>
+      </div>
+    </div>
+    <div class="gp-note">改动实时生效，自动保存在本机浏览器</div>
+  </div>
+  <script>
+  (function () {
+    var pop = document.getElementById('glassPop');
+    var btn = document.getElementById('navSettingBtn');
+    var alpha = document.getElementById('glassAlpha');
+    var alphaVal = document.getElementById('glassAlphaVal');
+    var opacity = document.getElementById('glassOpacity');
+    var opacityVal = document.getElementById('glassOpacityVal');
+    var bgList = document.getElementById('bgList');
+    var musicBtn = document.getElementById('navMusicBtn');
+    var musicWidget = document.getElementById('musicWidget');
+    var musicList = document.getElementById('musicList');
+    var musicNow = document.getElementById('musicNow');
+    var musicSeek = document.getElementById('musicSeek');
+    var musicCur = document.getElementById('musicCur');
+    var musicDur = document.getElementById('musicDur');
+    var musicPlayBtn = document.getElementById('musicPlayBtn');
+    var musicPlayImg = document.getElementById('musicPlayImg');
+    var audio = null;
+    var currentMp3 = '';
+    var currentLabel = '';
+    var KEY_ALPHA = 'thome-glass-alpha';
+    var KEY_OPACITY = 'thome-glass-opacity';
+    var KEY_BG = 'thome-bg';
+
+    function setVar(name, v) {
+      document.documentElement.style.setProperty(name, String(v));
+    }
+    function applyAlpha(v) {
+      setVar('--glass-alpha', v / 100);
+      try { localStorage.setItem(KEY_ALPHA, String(v)); } catch (e) {}
+    }
+    function applyOpacity(v) {
+      setVar('--glass-opacity', v / 100);
+      try { localStorage.setItem(KEY_OPACITY, String(v)); } catch (e) {}
+    }
+    alpha.addEventListener('input', function () {
+      alphaVal.textContent = alpha.value + '%';
+      applyAlpha(alpha.value);
+    });
+    opacity.addEventListener('input', function () {
+      opacityVal.textContent = opacity.value + '%';
+      applyOpacity(opacity.value);
+    });
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      pop.hidden = !pop.hidden;
+    });
+    musicBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      musicList.hidden = !musicList.hidden;
+    });
+    document.addEventListener('click', function (e) {
+      if (!pop.hidden && !(pop.contains(e.target) || btn.contains(e.target))) {
+        pop.hidden = true;
+      }
+      if (!musicList.hidden && !musicWidget.contains(e.target)) {
+        musicList.hidden = true;
+      }
+    });
+    function applyBg(url) {
+      if (url) {
+        document.body.style.backgroundImage = 'url("' + url + '")';
+      } else {
+        document.body.style.backgroundImage = '';
+      }
+    }
+    function markActive(url) {
+      var opts = bgList.querySelectorAll('.bg-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-bg') === url);
+      }
+    }
+    bgList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== bgList && !(t.getAttribute && t.getAttribute('data-bg'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-bg') : null;
+      if (!url) return;
+      applyBg(url);
+      try { localStorage.setItem(KEY_BG, url); } catch (e) {}
+      markActive(url);
+    });
+    function setMusicNow(text) {
+      musicNow.textContent = text;
+    }
+    function markMusicActive(url) {
+      var opts = musicList.querySelectorAll('.music-opt');
+      for (var i = 0; i < opts.length; i++) {
+        opts[i].classList.toggle('active', opts[i].getAttribute('data-mp3') === url);
+      }
+    }
+    function stopAudio() {
+      if (audio) {
+        audio.pause();
+        audio = null;
+      }
+      currentMp3 = '';
+      currentLabel = '';
+      musicBtn.classList.remove('mw-playing');
+      musicSeek.value = 0;
+      musicCur.textContent = '0:00';
+      musicDur.textContent = '0:00';
+      syncPlayBtn();
+    }
+    /* 播放控制按钮图标联动：有曲目时显示，播放=stop 样式，暂停=play 样式 */
+    function syncPlayBtn() {
+      if (audio && currentMp3) {
+        musicPlayBtn.hidden = false;
+        musicPlayImg.src = audio.paused ? '/text/play.png' : '/text/stop.png';
+      } else {
+        musicPlayBtn.hidden = true;
+      }
+    }
+    musicPlayBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (!audio || !currentMp3) return;
+      if (audio.paused) {
+        audio.play();
+        musicBtn.classList.add('mw-playing');
+        setMusicNow('正在播放：' + currentLabel);
+        syncPlayBtn();
+      } else {
+        audio.pause();
+        musicBtn.classList.remove('mw-playing');
+        setMusicNow('已暂停：' + currentLabel);
+        syncPlayBtn();
+      }
+    });
+    function fmtTime(t) {
+      t = Math.floor(t || 0);
+      var m = Math.floor(t / 60);
+      var s = t % 60;
+      return m + ':' + (s < 10 ? '0' + s : '' + s);
+    }
+    function updateProgress() {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        musicSeek.value = Math.round(audio.currentTime / audio.duration * 1000);
+        musicCur.textContent = fmtTime(audio.currentTime);
+        musicDur.textContent = fmtTime(audio.duration);
+      }
+    }
+    musicList.addEventListener('click', function (e) {
+      var t = e.target;
+      while (t && t !== musicList && !(t.getAttribute && t.getAttribute('data-mp3'))) t = t.parentNode;
+      var url = t && t.getAttribute ? t.getAttribute('data-mp3') : null;
+      var label = t && t.textContent ? t.textContent : url;
+      if (!url) return;
+      if (currentMp3 === url) {
+        if (audio && !audio.paused) {
+          audio.pause();
+          musicBtn.classList.remove('mw-playing');
+          setMusicNow('已暂停：' + label);
+          syncPlayBtn();
+        } else if (audio) {
+          audio.play();
+          musicBtn.classList.add('mw-playing');
+          setMusicNow('正在播放：' + label);
+          syncPlayBtn();
+        }
+        return;
+      }
+      stopAudio();
+      currentMp3 = url;
+      currentLabel = label;
+      audio = new Audio(url);
+      audio.addEventListener('loadedmetadata', updateProgress);
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', function () {
+        musicBtn.classList.remove('mw-playing');
+        currentMp3 = '';
+        currentLabel = '';
+        setMusicNow('播放结束：' + label);
+        markMusicActive('');
+        syncPlayBtn();
+      });
+      audio.play();
+      musicBtn.classList.add('mw-playing');
+      setMusicNow('正在播放：' + label);
+      markMusicActive(url);
+      syncPlayBtn();
+    });
+    /* 进度条拖动 seek：拖动不中断音频流 */
+    musicSeek.addEventListener('input', function () {
+      if (audio && audio.duration && isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = audio.duration * musicSeek.value / 1000;
+        musicCur.textContent = fmtTime(audio.currentTime);
+      }
+    });
+    /* 组件拖动：mousedown/mousemove/mouseup，限制在视口内，避开按钮与进度条 */
+    var mwDrag = null;
+    musicWidget.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button') || e.target.closest('input')) return;
+      e.preventDefault();
+      var rect = musicWidget.getBoundingClientRect();
+      musicWidget.style.left = rect.left + 'px';
+      musicWidget.style.top = rect.top + 'px';
+      musicWidget.style.bottom = 'auto';
+      musicWidget.style.right = 'auto';
+      mwDrag = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (!mwDrag) return;
+      var x = e.clientX - mwDrag.dx;
+      var y = e.clientY - mwDrag.dy;
+      x = Math.max(0, Math.min(x, window.innerWidth - musicWidget.offsetWidth));
+      y = Math.max(0, Math.min(y, window.innerHeight - musicWidget.offsetHeight));
+      musicWidget.style.left = x + 'px';
+      musicWidget.style.top = y + 'px';
+    });
+    document.addEventListener('mouseup', function () {
+      mwDrag = null;
+    });
+    /* 页面加载时恢复已保存设置 */
+    try {
+      var a = localStorage.getItem(KEY_ALPHA);
+      if (a !== null) {
+        alpha.value = a;
+        alphaVal.textContent = a + '%';
+        setVar('--glass-alpha', Number(a) / 100);
+      }
+      var o = localStorage.getItem(KEY_OPACITY);
+      if (o !== null) {
+        opacity.value = o;
+        opacityVal.textContent = o + '%';
+        setVar('--glass-opacity', Number(o) / 100);
+      }
+      var b = localStorage.getItem(KEY_BG);
+      if (b) {
+        var url = b;
+        try {
+          var obj = JSON.parse(b);
+          if (obj && obj.type === 'upload' && obj.data) url = obj.data;
+        } catch (e) {}
+        if (url) {
+          applyBg(url);
+          markActive(url);
+        }
+      }
+    } catch (e) {}
+    syncPlayBtn();
+  })();
+  </script>
+
+  <!-- ===== 隐藏彩蛋：隐秘入口 + 模拟下载中心（同步 ghpages） ===== -->
+  <div id="eggOverlay">
+    <div id="eggGlass">
+      <h3>隐秘入口</h3>
+      <div class="egg-hint">请输入通行口令</div>
+      <input id="eggPwd" type="password" placeholder="••••••••" autocomplete="off">
+      <div class="egg-err" id="eggErr"></div>
+      <button class="egg-btn" id="eggOk">进入</button>
+    </div>
+  </div>
+  <div id="eggDlOverlay">
+    <div id="eggDlHead">
+      <h2>模拟下载中心</h2>
+      <button id="eggDlBack">返回</button>
+    </div>
+    <div id="eggDlBody">
+      <table id="eggDlTable">
+        <thead><tr><th>名称</th><th>大小</th><th>操作</th></tr></thead>
+        <tbody id="eggDlTbody"></tbody>
+      </table>
+      <div id="eggDlEmpty">暂无文件</div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var PWD = 'xx xxx';
+    var SEQ = 'wwssaaddqe';
+    var keys = '';
+    var ov = document.getElementById('eggOverlay');
+    var dl = document.getElementById('eggDlOverlay');
+    var pwd = document.getElementById('eggPwd');
+    var err = document.getElementById('eggErr');
+    var tbody = document.getElementById('eggDlTbody');
+    var empty = document.getElementById('eggDlEmpty');
+    var DLBASE = '/text/' + encodeURIComponent('download？？？') + '/';
+
+    function fmt(n) {
+      if (n >= 1073741824) return (n / 1073741824).toFixed(2) + ' GB';
+      if (n >= 1048576) return (n / 1048576).toFixed(2) + ' MB';
+      if (n >= 1024) return (n / 1024).toFixed(2) + ' KB';
+      return (n || 0) + ' B';
+    }
+    function showPwd() { keys = ''; ov.classList.add('on'); pwd.value = ''; err.textContent = ''; setTimeout(function () { pwd.focus(); }, 30); }
+    function hidePwd() { ov.classList.remove('on'); }
+    function hideDl() { dl.classList.remove('on'); }
+    function loadDl() {
+      fetch(DLBASE + 'files.json').then(function (r) { return r.json(); }).then(function (list) {
+        tbody.innerHTML = '';
+        var arr = Array.isArray(list) ? list : [];
+        empty.style.display = arr.length ? 'none' : 'block';
+        empty.textContent = '暂无文件';
+        arr.forEach(function (it) {
+          var tr = document.createElement('tr');
+          var td1 = document.createElement('td'); td1.className = 'egg-name'; td1.textContent = it.name;
+          var td2 = document.createElement('td'); td2.textContent = fmt(it.size);
+          var td3 = document.createElement('td');
+          var a = document.createElement('a'); a.className = 'egg-dl-btn'; a.textContent = '下载';
+          a.href = DLBASE + encodeURIComponent(it.name); a.target = '_blank'; a.rel = 'noopener';
+          td3.appendChild(a);
+          tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+          tbody.appendChild(tr);
+        });
+      }).catch(function () {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        empty.textContent = '加载失败';
+      });
+    }
+    function openDl() { hidePwd(); dl.classList.add('on'); loadDl(); }
+    function enter() {
+      if (pwd.value === PWD) { openDl(); }
+      else { err.textContent = '口令不正确'; pwd.select(); }
+    }
+    document.addEventListener('keydown', function (e) {
+      if (dl.classList.contains('on')) return;
+      var t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) {
+        if (t.id !== 'eggPwd') keys = '';
+        return;
+      }
+      if (e.key && e.key.length === 1) {
+        keys = (keys + e.key.toLowerCase());
+        if (keys.length > SEQ.length) keys = keys.slice(-SEQ.length);
+        if (keys === SEQ) showPwd();
+      }
+    });
+    document.getElementById('eggOk').addEventListener('click', enter);
+    pwd.addEventListener('keydown', function (e) { e.stopPropagation(); if (e.key === 'Enter') enter(); });
+    ov.addEventListener('click', function (e) { if (e.target === ov) hidePwd(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { if (!dl.classList.contains('on')) hidePwd(); }
+    });
+    document.getElementById('eggDlBack').addEventListener('click', hideDl);
+  })();
+  </script>
+
+  <!-- ===== 导航栏搜索下拉（同步 ghpages） ===== -->
+  <div id="eggSearchWrap" hidden>
+    <div id="eggSearchResults"></div>
+    <div id="eggSearchEdge" hidden></div>
+  </div>
+
+  <script>
+  (function () {
+    var box = document.getElementById('eggSearchBox');
+    var btn = document.getElementById('eggSearchBtn');
+    var inp = document.getElementById('eggSearchInput');
+    var wrap = document.getElementById('eggSearchWrap');
+    var res = document.getElementById('eggSearchResults');
+    var edge = document.getElementById('eggSearchEdge');
+    var INDEX_URL = '/search-index.json';
+    var indexData = null;
+    if (!box || !btn) return;
+
+    function isOpen() { return box.classList.contains('active'); }
+    function open() {
+      box.classList.add('active');
+      setTimeout(function () { inp.focus(); }, 200);
+    }
+    function close() {
+      box.classList.remove('active');
+      wrap.hidden = true;
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (isOpen()) { close(); } else { open(); }
+    });
+    document.addEventListener('click', function (e) {
+      if (!isOpen()) return;
+      if (box.contains(e.target)) return;
+      close();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen()) close();
+    });
+    function loadIndex(cb) {
+      if (indexData) return cb(indexData);
+      fetch(INDEX_URL).then(function (r) { return r.json(); }).then(function (d) {
+        indexData = d || []; cb(indexData);
+      }).catch(function () { cb(null); });
+    }
+    function run() {
+      var kw = inp.value.trim();
+      res.innerHTML = '';
+      if (!kw) { wrap.hidden = true; return; }
+      wrap.hidden = false;
+      edge.hidden = false;
+      edge.textContent = '在 Edge 里搜索「' + kw + '」';
+      loadIndex(function (data) {
+        if (!data) {
+          res.innerHTML = '<div class="eggsearch-none">索引加载失败</div>';
+          return;
+        }
+        var k = kw.toLowerCase();
+        var m = data.filter(function (it) {
+          return (it.title && it.title.toLowerCase().indexOf(k) >= 0) ||
+                 (it.kw && it.kw.toLowerCase().indexOf(k) >= 0);
+        });
+        if (!m.length) {
+          res.innerHTML = '<div class="eggsearch-none">未找到相关页面</div>';
+          return;
+        }
+        m.forEach(function (it) {
+          var a = document.createElement('a');
+          a.href = it.path;
+          var s = document.createElement('span'); s.textContent = it.title;
+          var p = document.createElement('span'); p.className = 'eggsearch-path'; p.textContent = it.path;
+          a.appendChild(s); a.appendChild(p);
+          res.appendChild(a);
+        });
+      });
+    }
+    inp.addEventListener('input', run);
+    edge.addEventListener('click', function () {
+      var kw = inp.value.trim();
+      if (!kw) return;
+      window.open('https://www.bing.com/search?q=' + encodeURIComponent(kw), '_blank');
+    });
+  })();
+  </script>
+
+  <script>
+  (function () {
+    function init() {
+    function makePad(buttons) {
+      var el = document.createElement("div");
+      el.className = "touch-pad";
+      document.body.style.paddingBottom = "96px";
+      buttons.forEach(function (b) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "tbtn";
+        btn.textContent = b.label;
+        if (b.hold) {
+          var timer = null;
+          function start(e) { e.preventDefault(); b.fire(); if (b.repeat) {
+            timer = setInterval(b.fire, 90); } }
+          function end(e) { e.preventDefault(); if (timer) { clearInterval(timer); timer = null; }
+            if (b.release) { b.release(); } }
+          btn.addEventListener("touchstart", start, { passive: false });
+          btn.addEventListener("touchend", end, { passive: false });
+          btn.addEventListener("touchcancel", end, { passive: false });
+          btn.addEventListener("mousedown", start);
+          btn.addEventListener("mouseup", end);
+          btn.addEventListener("mouseleave", end);
+        } else {
+          function tap(e) { e.preventDefault(); b.fire(); }
+          btn.addEventListener("touchstart", tap, { passive: false });
+          btn.addEventListener("click", tap);
+        }
+        el.appendChild(btn);
+      });
+      return el;
+    }
+    function docKey(code, type) {
+      document.dispatchEvent(new KeyboardEvent(type || "keydown", { code: code, bubbles: true, cancelable: true }));
+    }
+    function winKey(key, type) {
+      window.dispatchEvent(new KeyboardEvent(type || "keydown", { key: key, bubbles: true, cancelable: true }));
+    }
+
+    /* 音乐播放器：手机端默认收起为小条，独立 toggle，不遮挡底部按键 */
+    var widget = document.getElementById("musicWidget");
+    if (widget) {
+      var mq = window.matchMedia("(max-width: 820px)");
+      var head = widget.querySelector(".mw-head");
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "mw-toggle";
+      toggle.title = "收起/展开播放器";
+      function setCollapsed(on) {
+        widget.classList.toggle("mw-collapsed", on);
+        toggle.textContent = on ? "展" : "收";
+      }
+      toggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setCollapsed(!widget.classList.contains("mw-collapsed"));
+      });
+      head.appendChild(toggle);
+      if (mq.matches) { setCollapsed(true); }
+      mq.addEventListener("change", function () {
+        setCollapsed(mq.matches);
+      });
+    }
+
+    var dino = document.getElementById("game");
+    if (dino) {
+      dino.addEventListener("touchstart", function (e) {
+        e.preventDefault(); docKey("Space");
+      }, { passive: false });
+      var shell = document.querySelector(".game-shell") || dino.parentNode;
+      var pad = makePad([
+        { label: "跳", fire: function () { docKey("Space"); } },
+        { label: "蹲", hold: true, repeat: false,
+          fire: function () { docKey("ArrowDown"); },
+          release: function () { docKey("ArrowDown", "keyup"); } }
+      ]);
+      shell.appendChild(pad);
+    }
+
+    var tetris = document.getElementById("boardCan");
+    if (tetris) {
+      document.querySelector(".t-wrap").appendChild(makePad([
+        { label: "←", fire: function () { winKey("ArrowLeft"); } },
+        { label: "→", fire: function () { winKey("ArrowRight"); } },
+        { label: "旋", fire: function () { winKey("ArrowUp"); } },
+        { label: "降", hold: true, repeat: true,
+          fire: function () { winKey("ArrowDown"); } },
+        { label: "落", fire: function () { winKey(" "); } }
+      ]));
+    }
+
+    /* 暗渊回廊：方向键移动（按住持续、松开停止），点画布朝触摸点攻击 */
+    var abCan = document.getElementById("abCan");
+    if (abCan) {
+      function moveBtn(label, key) {
+        return { label: label, hold: true, repeat: false,
+                 fire: function () { winKey(key); },
+                 release: function () { winKey(key, "keyup"); } };
+      }
+      var movePad = makePad([
+        moveBtn("↑", "ArrowUp"), moveBtn("↓", "ArrowDown"),
+        moveBtn("←", "ArrowLeft"), moveBtn("→", "ArrowRight")
+      ]);
+      movePad.classList.add("ab-move");
+      var gameBox = document.querySelector(".game-box");
+      gameBox.parentNode.insertBefore(movePad, gameBox.nextSibling);
+
+      function tp(e) { return e.touches[0] || e.changedTouches[0]; }
+      function toCan(type, t) {
+        abCan.dispatchEvent(new MouseEvent(type,
+          { clientX: t.clientX, clientY: t.clientY, button: 0, bubbles: true, cancelable: true }));
+      }
+      abCan.addEventListener("touchstart", function (e) {
+        e.preventDefault(); toCan("mousedown", tp(e));
+      }, { passive: false });
+      abCan.addEventListener("touchmove", function (e) {
+        e.preventDefault(); toCan("mousemove", tp(e));
+      }, { passive: false });
+      function endAtk(e) {
+        e.preventDefault();
+        window.dispatchEvent(new MouseEvent("mouseup", { button: 0 }));
+      }
+      abCan.addEventListener("touchend", endAtk, { passive: false });
+      abCan.addEventListener("touchcancel", endAtk, { passive: false });
+    }
+    }
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+
+  <script id="fx-polish-js">
+  (function () {
+    "use strict";
+    var ov = document.getElementById("eggOverlay");
+    var dl = document.getElementById("eggDlOverlay");
+    if (!ov && !dl) return;
+
+    var gl = document.createElement("div");
+    gl.id = "fxGlitch";
+    gl.innerHTML = '<div class="fx-scan"></div><div class="fx-rgb"></div>' +
+                   '<div class="fx-code"></div><div class="fx-title">SYSTEM BREACH</div>';
+    document.body.appendChild(gl);
+    var codeEl = gl.querySelector(".fx-code");
+    var timer = null;
+    var busy = false;
+
+    function randCode() {
+      var chars = "01ABCDEF#$%&@!?<>/|=+*{}[]";
+      var out = "";
+      for (var i = 0; i < 1400; i++) {
+        out += chars.charAt(Math.floor(Math.random() * chars.length));
+        if (i % 72 === 71) { out += "
+"; }
+      }
+      return out;
+    }
+    function paint() { codeEl.textContent = randCode(); }
+
+    function glitch(ms, done) {
+      paint();
+      gl.classList.add("on");
+      timer = setInterval(paint, 70);
+      setTimeout(function () {
+        clearInterval(timer);
+        timer = null;
+        gl.classList.remove("on");
+        if (done) { done(); }
+      }, ms);
+    }
+
+    function watch(el, hideClass, ms) {
+      if (!el) { return; }
+      new MutationObserver(function () {
+        if (busy || !el.classList.contains("on")) { return; }
+        busy = true;
+        document.body.classList.add(hideClass);
+        glitch(ms, function () {
+          document.body.classList.remove(hideClass);
+          busy = false;
+        });
+      }).observe(el, { attributes: true, attributeFilter: ["class"] });
+    }
+    watch(ov, "fx-hide-egg", 1100);
+    watch(dl, "fx-hide-dl", 1300);
+
+    /* 搜索 / 设置：收起动画 */
+    function watchHide(el) {
+      if (!el) { return; }
+      var closing = false;
+      new MutationObserver(function () {
+        if (closing || !el.hidden) { return; }
+        closing = true;
+        el.hidden = false;
+        el.classList.add("fx-closing");
+        setTimeout(function () {
+          el.hidden = true;
+          el.classList.remove("fx-closing");
+          setTimeout(function () { closing = false; }, 0);
+        }, 190);
+      }).observe(el, { attributes: true, attributeFilter: ["hidden"] });
+    }
+    watchHide(document.getElementById("eggSearchWrap"));
+    watchHide(document.getElementById("glassPop"));
+
+    /* 音乐列表：展开后若超出屏幕底部，把整个播放器上移，背景随之包住列表 */
+    var mw = document.getElementById("musicWidget");
+    var ml = document.getElementById("musicList");
+    var mb = document.getElementById("navMusicBtn");
+    if (mw && ml && mb) {
+      function place() {
+        if (ml.hidden) { return; }
+        var r = mw.getBoundingClientRect();
+        var over = r.bottom - (window.innerHeight - 12);
+        if (over > 0) {
+          var top = parseFloat(window.getComputedStyle(mw).top);
+          if (!isFinite(top)) { top = r.top; }
+          mw.style.top = Math.max(8, top - over) + "px";
+          mw.style.bottom = "auto";
+        }
+      }
+      mb.addEventListener("click", function () { setTimeout(place, 0); });
+      window.addEventListener("resize", function () { if (!ml.hidden) { place(); } });
+    }
+  })();
+  </script>
+
+  <main class="nov-main">
+    <div class="nov-head">
+      <a class="nov-back" href="/novels.html">← 书架</a>
+      <div class="nov-titlebox">
+        <p class="nov-title">世界尽头的游客</p>
+        <div class="nov-vol" id="novVol"></div>
+      </div>
+      <button type="button" class="nov-toc-btn" id="novTocBtn">目录</button>
+    </div>
+    <div class="nov-bar"><i id="novBar"></i></div>
+    <div class="nov-stage" id="novStage"></div>
+    <div class="nov-nav">
+      <button type="button" id="novPrev">上一章</button>
+      <div class="nov-progress" id="novProg">— / —</div>
+      <button type="button" id="novNext">下一章</button>
+    </div>
+
+    <div class="nov-toc" id="novToc">
+      <div class="nov-toc-panel">
+        <div class="nov-toc-head"><strong>章节目录</strong><button type="button" class="nov-toc-close" id="novTocClose">✕</button></div>
+        <div class="nov-toc-list" id="novTocList"></div>
+      </div>
+    </div>
+  </main>
+
+<script>
+(function () {
+  var CH = [{"vol": "题记", "title": "题记", "html": "<div class=\"vol-head\" style=\"min-height:auto;padding-top:0\">\n          <span class=\"roman\">T I<\/span>\n          \n          <div class=\"vol-sub\" style=\"max-width:100%;border-top:0;padding-top:0\"> <\/div>\n          <p style=\"text-indent:0;font-size:16px;line-height:2.1;color:#b8b0bd;letter-spacing:.04em;margin-top:2em\">\n            这份文本由两部分拼成：一套在 2020 年 12 月 4 日随一具尸体出现的机械护具里的档案，以及我在把它整理成书时补进去的那些空处。\n          <\/p>\n          <p style=\"text-indent:0;font-size:16px;line-height:2.1;color:#b8b0bd;letter-spacing:.04em;margin-top:1em\">\n            档案本身是残缺的：有的日期，有的名字，有的整段都被删掉了。凡是档案里被涂黑的地方，我没有替它补上；凡是档案沉默的地方，我只能凭前后文推断——推断错了，那是我的问题，不是死者的。\n          <\/p>\n          <p style=\"text-indent:0;font-size:16px;line-height:2.1;color:#b8b0bd;letter-spacing:.04em;margin-top:1em\">\n            全书五卷。前三卷讲一件事，从三个方向逼近它：一群人在三十天里如何变成另一个人；一个人在荒原上如何一步步走向它；一颗星球如何用三周死掉。第四卷是围城。第五卷是那个洞。\n          <\/p>\n          <p style=\"text-indent:0;font-size:16px;line-height:2.1;color:#b8b0bd;letter-spacing:.04em;margin-top:1em\">\n            读者若想知道真相，需要读到最后一页。中途所有看起来像答案的东西，都不是答案。\n          <\/p>\n        <\/div>"}, {"vol": "卷一 · 硬起来的心", "title": "第一章 房客", "html": "<p>2019 年 12 月 16 日上午九点四十分，Site-19 地下七层的会议室里只坐了七个人。桌子对面的墙上是块投影幕，幕上什么都没有，只有一片灰——那是神经拓扑仪的空载状态。<\/p>\n          <p>O5-7 坐在长桌的一端。她那年五十四岁，头发剪得很短，说话时习惯把手平放在桌面上，像在压住什么东西。<\/p>\n          <p>“兰姆博士。”她说，“从最基础的讲起。”<\/p>\n          <p>薇拉·兰姆站起来。她是 PNEUMA 项目的技术负责人，四十岁上下，声音很轻，说一句停一下，像在等别人反驳。<\/p>\n          <p>“人类的集体无意识——我们内部叫心理空间——一直被认为是没有结构的。荣格那套说法没有可测量性，所以我们一百年来都当它是个比喻。”<\/p>\n          <p>她把幕上的灰调成一张图。图上不是大脑，不是神经，是一座城市的俯视图：有主干，有巷道，有某种类似公共设施的东西，比例尺荒唐。<\/p>\n          <p>“去年我们做出可测量的桥接。然后我们在里面找到了一块东西。”<\/p>\n          <p>“什么东西？”有人问。<\/p>\n          <p>“一块非人造结构。”兰姆说，“‘非人造’这个说法不准确。它在每一个新生儿身上都同步生长，跟着语言一起长，跟着羞耻心一起长。到青春期它就和这个人完全长在一起了，我们没有办法从任何一具大脑里把它分离出来单独染色。”<\/p>\n          <p>会议室安静了十几秒。空调的声音很清楚。<\/p>\n          <p>“它在做什么？”O5-7 问。<\/p>\n          <p>兰姆的手指在桌沿上按了一下。<\/p>\n          <p>“它住在我们里面。”她说，“它用我们思考。”<\/p>\n          <p>有人笑了一声，很短，随即收住。<\/p>\n          <p>坐在末位的一位 O5 说：“那割掉它就是了。”<\/p>\n          <p>“割不掉。”兰姆说，“它不是肿瘤。它是我们的一部分。问题在于，它不属于我们。”<\/p>\n          <p>“你怎么知道它不属于我们？”<\/p>\n          <p>“因为它比我们老。”兰姆说，“我们测了它的生长节律。它的‘年龄’和人类这个物种对不上。它不是在我们身上长出来的，它是先在，然后我们绕着它长。”<\/p>\n          <p>O5-7 一直没说话。她低头在纸上写了几个字，然后把纸扣在桌面上，抬头问了一个很轻的问题：<\/p>\n          <p>“它在里面，多久了？”<\/p>\n          <p>“从我们会说话开始。”兰姆说，“也就是说，从我们开始是我们的时候开始。”<\/p>\n          <p>散会以后，会议记录被标为最高密级，只留七份，全部纸质，编号，签字。七份里有五份在接下来一个月里被销毁。剩下两份的下落，档案里没有记载。<\/p>\n          <p>那天下午兰姆在走廊上遇见负责送文件的老职员，对方问她项目顺不顺利。她说顺利。老职员说那好，年底加班费能批下来了。<\/p>\n          <p>她说了声谢谢，走进电梯，靠着轿厢壁站了很久。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第二章 不疼", "html": "<p>志愿受试者 D-1042，男性，四十二岁，Site-19 后勤清洁工，无异常史，已婚，有一个九岁的儿子。他自己签的字，签之前被告知这是一项“高级职员特别关注项目”，报酬是三年工资，附一份终身医疗保险。<\/p>\n          <p>程序分三段。第一段是常规桥接，第二段是定位，第三段是“接触”。前两段他都没事，只是说做梦变多了，梦里有一座他不认识的城市，街道很宽，没有人。<\/p>\n          <p>第三段在 12 月 18 日凌晨两点进行。过程四十一分钟。出来的时候他坐在观察椅上，眼睛睁着，看天花板的水管。<\/p>\n          <p>他四十八小时没有说一句话。<\/p>\n          <p>第三天上午，兰姆坐在他对面，问他还记不记得看到什么。他想了很久，说了一句：<\/p>\n          <p>“它不疼。”<\/p>\n          <p>兰姆让他再说一遍。他说：“我不知道该怎么讲。它不是东西。它没有形状。可我能感觉到它——就像你能感觉到自己的手。它一直在那儿，从我很小的时候就在那儿。它不疼。它也不高兴，也不难过。它什么感觉都没有。它就是……在那儿。”<\/p>\n          <p>第五天，他又说了一句：<\/p>\n          <p>“我一直在想，我为什么会觉得自己疼。”<\/p>\n          <p>记录员把这句话划了红线，附在当天的简报上。兰姆在那句话旁边写了一个问号，然后把整个简报封进档案袋。<\/p>\n          <p>第九天，D-1042 说了最后一段完整的话。他坐在窗口，外面在下雪。<\/p>\n          <p>“它没有名字。它不想要任何东西。它不需要。它只是在这里。它已经在这里很久了。它不觉得自己是客人。”<\/p>\n          <p>“那它觉得我们是什么？”兰姆问。<\/p>\n          <p>他转过头看她，表情很平静，像在解释一件普通的家务事。<\/p>\n          <p>“它觉得我们住在它里面。”<\/p>\n          <p>第十一天，他要求被记忆删除。兰姆问他为什么。<\/p>\n          <p>他说：“因为我开始觉得它是对的。”<\/p>\n          <p>删除在 12 月 30 日完成。他回到后勤岗位，继续拖地，见到同事会点头。他的档案末尾有一行小字：受试者于次年 4 月死于一场普通车祸，与项目无关。<\/p>\n          <p>那行字下面没有任何人签字。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第三章 一锅炖菜", "html": "<p>伦理委员会在 12 月 17 日收到议程。委员长玛尔塔·奥孔科沃那天在 Site-17 的办公室里接待兰姆，谈了五十分钟。<\/p>\n          <p>按规程，这种规模的行动需要伦理委员会出具“无道德障碍”意见。奥孔科沃看过太多这类意见，绝大多数她都签得很快：记忆删除、收容措施、必要时的人道处置。她签字从来不看旁边的注释。<\/p>\n          <p>这一次她把文件读了两遍。<\/p>\n          <p>“我要问一个私人问题。”她说。<\/p>\n          <p>“请。”<\/p>\n          <p>“如果它真的是房客，”奥孔科沃说，“那我们算什么？房子？”<\/p>\n          <p>兰姆沉默了几秒。“房子不会问这种问题。”<\/p>\n          <p>奥孔科沃点点头，把笔盖打开。<\/p>\n          <p>“我需要你明确一件事。”她说，“这不是‘处置’，也不是‘收容’。我们接下来要签的，是让这个物种停止存在。”<\/p>\n          <p>“是的。”<\/p>\n          <p>“包括我。”<\/p>\n          <p>“是的。”<\/p>\n          <p>她签了名。签名很稳，一笔到底。<\/p>\n          <p>那天晚上她回家，给女儿做了炖菜。女儿十四岁，正在为一场考试生气，吃饭时一直低头刷手机。奥孔科沃问她味道怎么样，女儿说太咸了。<\/p>\n          <p>“下次少放点盐。”奥孔科沃说。<\/p>\n          <p>“你每次都这么说。”<\/p>\n          <p>“那这次记住了。”<\/p>\n          <p>女儿抬起头看她一眼，觉得母亲今天有点奇怪。奥孔科沃笑了笑，说没什么，明天要出差。<\/p>\n          <p>她把碗收进水池，洗了，擦干，放回柜子。然后上楼，在书房里坐了一整夜，没有开灯。<\/p>\n          <p>那顿炖菜是女儿最后一次吃她做的饭。这一段不在任何档案里，是我从 Site-17 的一份食堂采购单上推出来的：12 月 17 日那天，那个家庭账户买了牛肉、胡萝卜和两罐番茄。之后再没有过。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第四章 扫帚", "html": "<p>12 月 19 日，第一批指令下发到所有站点主管。内容涂黑，只留执行要求与时间表。当天下午，查尔斯·基尔斯博士在 C 区走廊上拦住了 O5-7。<\/p>\n          <p>基尔斯那年六十一岁，是基金会里最老的一批研究员之一，负责过四个 Keter 级项目的收容设计。他不算温和的人，但他有一种老派的固执：程序要对。<\/p>\n          <p>“我要一个解释。”他说。<\/p>\n          <p>“你会拿到文件的。”O5-7 说。<\/p>\n          <p>“我不要文件。文件我看不懂。我要一个解释。”<\/p>\n          <p>“基尔斯博士，走廊上不方便。”<\/p>\n          <p>“那就现在，这里。”他说，“你告诉我，我们这是在做什么。”<\/p>\n          <p>O5-7 停了脚步。走廊里没有别人。<\/p>\n          <p>“清场。”她说。<\/p>\n          <p>“清场。”基尔斯重复了一遍这个词，像在嘴里咬它，“不是清除。”<\/p>\n          <p>“不是。”<\/p>\n          <p>“区别在于，清除是杀敌人。”基尔斯说，“清场是把房子腾空，好让别人住进来。”<\/p>\n          <p>O5-7 看着他，没有回答。<\/p>\n          <p>“我在这栋楼里干了三十四年。”基尔斯说，“我签过的处决令有一百三十七份。每一份我都知道为什么。这一次我不知道。你们让我执行一件我不知道为什么的事，还要我签字。”<\/p>\n          <p>“你可以不签。”<\/p>\n          <p>“我当然可以不签。”他说，“我在问你，为什么。”<\/p>\n          <p>走廊尽头的灯管有一根在闪。O5-7 的声音很低。<\/p>\n          <p>“因为房子已经不是我们的了，基尔斯。它从来就不是。我们只是住得久了，忘了这件事。”<\/p>\n          <p>基尔斯没有说话。他把手里的文件夹合上，夹在腋下，往电梯方向走。走了几步，他回过头。<\/p>\n          <p>“我拒绝成为一把扫帚。”<\/p>\n          <p>当天下午他递交辞呈，理由栏写的是“个人原因”。人事部按流程办了。他在离职面谈里只说了一句话：“请把我在 Site-19 的权限保留到月底，我还有些私人物品。”<\/p>\n          <p>权限保留到了 12 月 24 日。25 日之后，监控里再没有他的记录。一支刺杀小组被派出去找他，档案里没写结果。<\/p>\n          <p>他的告别邮件发给了一百一十四个人，只有一行字：<\/p>\n          <p class=\"quote\">我拒绝成为一把扫帚。<\/p>\n          <p>这封邮件在 12 月 22 日之后被系统批量删除。但有三个人把它打印了出来，藏在家里。其中一个人后来在甘齐尔被俘，那份打印件被 GOC 收录，编号 G-1147。这本书里关于 12 月 19 日走廊的那一段，就是从这份口供里来的。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第五章 七天", "html": "<p>12 月 19 日到 12 月 25 日，基金会内部统计：自杀四十三起，辞职二百一十一人，失联一百零九人。基金会全球雇员约八千人，七天内走掉将近百分之五。<\/p>\n          <p>数字是冷的。数字后面是具体的人。<\/p>\n          <p>Site-64 的夜班警卫汉斯·布伦纳是第九个。他在 12 月 20 日凌晨四点交班，把配枪和门禁卡放在值班台上，跟接班的人说自己要回家看看母亲。接班的人说去吧，替我问好。<\/p>\n          <p>汉斯走到停车场，坐进车里，开出去两公里，停在一条没有路灯的岔路上。他没有回家。他母亲的电话在三天前就打不通了。<\/p>\n          <p>辞职的人里，理由栏大多写着“身体原因”“家庭原因”“职业规划调整”。没有人写真实理由，因为真实理由不能写在纸上。人事部也从不追问，他们只是盖章，收回证件，删掉权限。<\/p>\n          <p>12 月 21 日，人事主管在日报里写了一句：<span class=\"small\">本部门已按规程完成人员流动处理。<\/span><\/p>\n          <p>到 12 月 22 日早上，剩下的人不足百分之十二。Site-19 的食堂只开了一个窗口，队伍却比平时短。走廊里开始出现回声，这是以前没有的。<\/p>\n          <p>留下的人里，有一部分是不知道真相的基层人员——他们拿到的说法是“全球性收容失效应急响应”。另一部分知道真相，并且选择留下。<\/p>\n          <p>兰姆是后者。她在 12 月 21 日的私人笔记里写过一段，这份笔记被装订进了 PNEUMA 的附录：<\/p>\n          <p class=\"quote\">我数了一下，愿意留下来的人里，有九个是亲眼看过它的。九个。我们一共有八千个人，只有九个看过。剩下的人是在为一件他们从没见过的事情杀人。<\/p>\n          <p class=\"quote\">我不知道这算不算我们比它更坏。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第六章 硬起来", "html": "<p>12 月 22 日凌晨，一批文件下发到所有仍然在册的高级职员与站点主管。每份文件配一个密封袋，袋上印着一行字：<\/p>\n          <p class=\"center small\">阅读后立即销毁。内容不得以任何形式转述。<\/p>\n          <p>袋里还有一张便条，字是打印的，只有一句话：<\/p>\n          <p class=\"quote\">把你们的心变硬。<\/p>\n          <p>文件的内容在本书里不会出现。不是我不写，是它不能被写下来——这一点，到第五卷读者会明白。<\/p>\n          <p>我们能写下来的只有它的效果。<\/p>\n          <p>Site-91 主管玛戈·奥利维拉那天凌晨四点收到文件。她在办公室里读完，把袋子放进碎纸机，看着纸屑落进箱子，然后把墙上的全家福取下来，收进抽屉最里面。照片上她丈夫在笑，两个孩子在沙滩上举着铲子。<\/p>\n          <p>她关抽屉的时候用了点力，抽屉卡了一下，她再推一次，合上了。<\/p>\n          <p>五点十分，她给女儿打电话。女儿没接。她留了一条语音，说了三分钟天气，说今年圣诞可能回不去，让女儿别乱花钱。然后她挂断，去洗手间洗脸，回来开会。<\/p>\n          <p>当天上午九点，她在例会上布置了第一批异常项目的处决名单，语气和布置季度盘点时一模一样。会后有个年轻研究员问她：“主管，我们真的要做这个吗？”<\/p>\n          <p>她看了他一眼，说：“名单是上面定的。你负责 1141 到 1160。”<\/p>\n          <p>研究员说：“我妈在城西。”<\/p>\n          <p>“那你就更要做完。”玛戈说，“做完，这件事才有意义。”<\/p>\n          <p>她自己信不信这句话，没人知道。她的私人记录在 12 月 22 日之后全部中断。最后一次记录是一条未发出的短信，收件人是她女儿，正文只有一个字：<\/p>\n          <p class=\"center small\">对<\/p>\n          <p>从那以后，所有读过文件的人身上都出现了同一种变化。不是疯狂，不是冷酷——冷酷会露出来，会被人看见。他们的变化更彻底：那些让他们成为人的东西，被移走了。他们照旧喝咖啡，照旧说笑，照旧记得自己女儿的名字，但记得的方式变了，像记得一个数据。<\/p>\n          <p>彼得罗后来在 Site-19 的走廊里见过这种眼神，他用了一个很笨的说法：<\/p>\n          <p class=\"quote\">像有人把里面的灯关了，但家具还摆着。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第七章 处决日", "html": "<p>12 月 25 日，圣诞节。Site-19 开始执行异常项目处决。<\/p>\n          <p>按名单，先处决的是无交流能力、低风险、长期无异常活动的项目——从最容易的开始。这不是仁慈，是流程：先做简单的，让执行者熟悉动作。<\/p>\n          <p>研究员雅各布·雷耶斯负责 SCP-████，一个八年前由他本人接手的人形项目。它会说话，喜欢讲冷笑话，喜欢在观察窗上用马克笔画画。它一直被评级为 Safe，从未造成伤亡。<\/p>\n          <p>那天下午两点，雅各布进了收容间，带了一杯咖啡。他把咖啡放在桌上，说今天要做检查。<\/p>\n          <p>它看着他，说：“你手在抖。”<\/p>\n          <p>“是冷。”雅各布说。<\/p>\n          <p>“这里恒温二十四度。”<\/p>\n          <p>雅各布没有回答。他从枪套里拔出手枪。它没有躲，也没有求，只是把咖啡端起来喝了一口，说：“有点苦。”<\/p>\n          <p>然后他开枪。<\/p>\n          <p>三分钟后他通过对讲机报告：“执行完毕。”语气像在报一张单据。之后他去洗手间洗了手，洗了四遍。当天晚上他照常吃饭，照常睡了六个小时——这一点是他自己在事后报告里写的，他写这句话的时候没有任何情绪，就像在核对数据。<\/p>\n          <p>那份事后报告一共四行。最后一行是：<\/p>\n          <p class=\"quote\">执行过程中未出现异常抵抗，流程符合规范。<\/p>\n          <p>12 月 26 日到 31 日，Site-19 处决了三百七十四个人形与亲近人类的异常项目。到 31 日夜里，Site-19 的收容区几乎空了。空下来的收容间里还留着那些东西生活过的痕迹：墙上的画、磨平的床沿、地上的划痕。<\/p>\n          <p>清洁组接到指令：1 月 1 日之前全部清空，恢复标准配置。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第八章 食堂", "html": "<p>执行 ES-06 的是机动特遣队 Zeta-19「孤独一人」。这支队伍平时负责反渗透，成员十二人，队长是阿黛尔·沃斯，二十九岁。<\/p>\n          <p>1 月 2 日凌晨三点四十分，他们抵达绝对斥外站点 ES-06。证件齐全，口令正确，门卫放行。四点钟，他们把值夜的人赶进食堂，四点零三分开始射击。<\/p>\n          <p>整个过程十一分钟。事后清点：站点在册人员六十四名，死亡六十三名，失踪一名。<\/p>\n          <p>阿黛尔在报告里写的是“任务完成，无异常”。她没有写的是，她在射击进行到第六分钟时停了一下。<\/p>\n          <p>她看见一张桌子底下有个人在爬。那人穿着一件灰色的工装，胸口挂着电网技术员的牌子，正贴着地砖往门口挪。<\/p>\n          <p>她看见了。她的枪口抬起来，又放下。<\/p>\n          <p>按规程，她应该报告。她没有。<\/p>\n          <p>事后她自己在心里给这件事找过很多理由：也许是我射界里有人挡着；也许是子弹不够；也许是我以为他已经死了。这些理由都成立，也都站不住——她清楚自己没有报告，是因为她突然很想让某个人活下来。<\/p>\n          <p>她不知道那个人叫什么。她甚至没看清他的脸。她只知道他从桌子底下爬出去的时候，腿在抖。<\/p>\n          <p>五点二十分，任务结束，队伍撤回。阿黛尔在站外的车里吐了，吐了很久，然后用水漱口，把脸擦干，回到车上，报告“可以出发”。<\/p>\n          <p>同车的队员问她是不是吃坏了东西。她说可能是。<\/p>\n          <p>她后来的结局，档案里没有记载。Zeta-19 的编制在 1 月底被撤销，人员并入其他特遣队。她的名字最后一次出现在一份调令上，是调往 Site-62C。<\/p>"}, {"vol": "卷一 · 硬起来的心", "title": "第九章 空会议室", "html": "<p>1 月 2 日晚上，Site-19 地下七层的会议室没有人。<\/p>\n          <p>O5-7 一个人坐在长桌一端。桌上摊着那七份纸质记录中的最后两份。她把其中一份翻到最后一页，看了很久，然后合上。<\/p>\n          <p>会议室的灯只开了一半。她面前的桌面上放着一张照片，翻扣着。她没有把它翻过来。<\/p>\n          <p>“对不起。”她说。<\/p>\n          <p>声音很小，落在空房间里，没有回声——这间会议室做过声学处理，本来就不该有回声。<\/p>\n          <p>她拿起电话，拨了一个号码。号码是十一月的，一个已经不存在的分机。听筒里响了三声，然后是机械的女声：<\/p>\n          <p class=\"center small\">您拨打的号码是空号。<\/p>\n          <p>她挂断，站起来，把两份记录放进碎纸机。<\/p>\n          <p>然后她走出会议室，锁上门。走廊的灯是白的，很长，尽头是电梯。<\/p>\n          <p>她没有坐电梯。她走楼梯下到地下九层，那里有一个只有她一个人有钥匙的房间。<\/p>\n          <p>第二天的日程表上，她的名字后面写着：<span class=\"small\">09:00 — PNEUMA 后续评估（取消）<\/span>。<\/p>\n          <hr class=\"dot\">\n          <p>以上是卷一。三十天里，一群正常人变成了另一群人。他们做的事有理由，但那个理由从没写进任何一份文件。<\/p>\n          <p>下一卷换一个人来讲。他叫彼得罗·威尔逊，是那天在桌子底下爬的那个。他不知道上面这些事。他要走十一个月，才走到能看懂它的地方。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十章 金属味", "html": "<p>我叫彼得罗·威尔逊。ES-06 绝对斥外站点的电网技术员，三十一岁，没有家人，没有爱好，有一套租来的公寓和一辆开了七年的车。<\/p>\n          <p>我的工作是把一根电线从这个铁箱挪进那个铁箱。一年三百六十五天，没人记得我的名字，除了食堂打饭的阿姨，她记得我不吃胡萝卜。<\/p>\n          <p>事情是从食堂开始的。<\/p>\n          <p>那天我值夜班。凌晨四点，我坐在靠门第三张桌子，正在吃一份冷掉的通心粉，因为打饭阿姨那天没来。<\/p>\n          <p>门被推开，进来一群人。他们穿特遣队的制服，戴面罩，动作很整齐。有人喊了一声：“都到食堂集合，例行清点。”<\/p>\n          <p>值夜的同事陆续进来。有人还在系腰带，有人在骂。他们清点了人数，然后关上了门。<\/p>\n          <p>我记得的下一件事，是第一声枪响。<\/p>\n          <p>我不记得自己是怎么钻到桌子底下的。事后我想了很久，也想不起来。人到了那个时刻，身体会替你做决定，脑子在后面追。<\/p>\n          <p>我贴着地砖爬。地砖是那种很便宜的灰色防滑砖，缝里积着油。有人踩到我的手，我抽回来，继续爬。有人倒在我前面，血顺着砖缝流到我手边，是温的。<\/p>\n          <p>食堂里大概六十几个人，都在往门口挤。门口有一排枪，所以人挤到一半又往回挤，像水撞上墙。<\/p>\n          <p>我闻到金属味。不是铁锈，是血。那种味道很奇怪，它不像别人描述的那样腥，它就是一股很干净的金属味，像含着一枚硬币。我到现在还能在舌根尝到它。<\/p>\n          <p>枪声停的时候，我离门口还有十二米。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十一章 护具", "html": "<p>绝对斥外护具放在 B 区的准备间，离食堂隔着一条走廊和一个转角。我知道它在哪儿，因为我给它接过三次线。<\/p>\n          <p>我爬出食堂的后门，走廊里没有灯。我爬过转角，站起来跑，跑到 B 区，撞开准备间的门，反手关上，靠在门上喘。<\/p>\n          <p>护具立在房间中央的支架上，两米高，银灰色，胸口有一块黑色的面板。它的内部结构图上写着它自己的名字：绝对斥外护具，SCP 基金会设计制造。<\/p>\n          <p>我拉下面板，钻进去，扣上。系统开机声很轻，面板上亮起一行字：<\/p>\n          <p class=\"center small\">感知过滤：已启用<\/p>\n          <p>我不懂它的原理。我是个接电线的。我大概知道它是什么：它不是隐身。它不让人看不见我。它让人看见我之后，无法确认自己看见了我。这两回事听起来一样，其实差得远——区别是，我可以站在他们中间，看着他们，而他们的大脑会把我当成背景的一部分，像墙上的消防栓。<\/p>\n          <p>我合上面板之后，站了大概三分钟，才敢把门开一条缝。<\/p>\n          <p>走廊里有人在走动。他们没有跑，也没有喊，就是走动。有人在检查，有人在收枪，有人在把尸体翻过来。我听见一个人说：“这个还有气。”<\/p>\n          <p>然后是第二声枪响。<\/p>\n          <p>我贴着墙走到食堂门口。里面灯还亮着，六十几个人躺在地上，姿势各不相同，有人手里还抓着椅子腿。四个人在里面走动，一个一个检查，每一个脑袋补一枪。<\/p>\n          <p>他们没有拿走任何东西。没有翻柜子，没有开保险箱，没有去档案室。他们只是检查、补枪、走开。<\/p>\n          <p>我在门口站了很久，腿一直在抖。我是个懦夫，这一点我承认。我那时候唯一想的是：别发出声音。别呼吸。别让他们注意到门边站着一个人。<\/p>\n          <p>五点二十分，他们撤了。我在门口又站了二十分钟，才敢动。<\/p>\n          <p>我从一个死掉的同事身上拿了一瓶水、一个打火机、一把折叠刀。我记住了他的名字，他叫埃德加，是管档案的，有个女儿。我后来一直没敢想他的女儿。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十二章 沙漠", "html": "<p>ES-06 建在沙漠里。最近的公路在十六公里外，最近的安全屋在四十公里外。<\/p>\n          <p>我走了整整一夜。护具维持我的身体，据说不吃不喝也能撑，可我的脑子还是觉得渴，每隔半小时就要拧开水瓶盖抿一口。这大概就是所谓的人性：身体已经不需要了，习惯还在。<\/p>\n          <p>天亮的时候我看见远处的公路，公路边有加油站，加油站后面有一排低矮的白色房子。那是给来往的特工准备的安全屋。我走了三个小时才到。<\/p>\n          <p>门没锁。里面有净水、罐头、毯子、一台老式收音机，还有一个上锁的铁柜。我用折叠刀撬开铁柜，里面是两把手枪、六个弹匣、一份应急手册。<\/p>\n          <p>我坐在地上喝了半瓶水，然后打开网络终端。<\/p>\n          <p>那天夜里，我读到了一段话。它被发给了地球上每一个政府、每一家媒体、每一个异常机构：<\/p>\n          <p class=\"block\"><b>以下信息由 O5 议会一致同意发布。<\/b><br><br>对于目前尚不知晓我们存在的各位：我们代表 SCP 基金会。我们此前的任务，是收容与研究异常物体、实体以及其他各类现象；这项任务是我们这个组织一百余年来的全部内容。<br><br>由于我们无法控制的原因，该指令现已变更。我们的新任务是：<b>灭绝人类<\/b>。<br><br>此后不再有任何通讯。<\/p>\n          <p>我读了三遍。第三遍的时候我吐在了地板上。吐完我把那半瓶水喝完，坐回椅子上，盯着屏幕，一直到天亮。<\/p>\n          <p>我不明白。这是我能想出的全部。我不明白。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十三章 表格一", "html": "<p>接下来的十几天，我坐在那间安全屋里，盯着屏幕看世界怎么死。我把看到的东西记在一张纸上，后来抄进了日志。基金会做事有表格的习惯，我也学他们，列成两栏：一边是编号，一边是他们做的事。<\/p>\n          <div class=\"block\">\n            <b>SCP-096<\/b>｜它的脸被传到所有社交平台。图片撤下之前，死亡人数已经到几百。据我所知，那东西还在跑。<br><br>\n            <b>SCP-169<\/b>｜一串联的核弹在它背上引爆，它只是稍微翻了个身。然后海岸线没了。几十个沿海城镇的地基变成了海。<br><br>\n            <b>SCP-662<\/b>｜二十四小时之内，“万事通先生”出现在好几个国家元首身边，用当时手边能找到的东西把他们解决掉，然后消失。二十四小时之后它停了。我不知道为什么。<br><br>\n            <b>SCP-610<\/b>｜样本在纽约和德里被释放。整片区域的人在两小时内被感染、被吞掉。后来是 GOC 和破碎之神教会一起把扩散截住的。<br><br>\n            <b>SCP-682<\/b>｜已释放。\n          <\/div>\n          <p>最后那一行我写了三遍，因为手一直抖。<\/p>\n          <p>我不明白为什么会这样。这句话我在那十几天里在心里说了几百遍，说多了就变成一种背景噪音，像空调。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十四章 薄荷味", "html": "<p>电视是在第三天下午断的。<\/p>\n          <p>断之前我在看一段直播。瑞典，特隆萨郊外，GOC 的帐篷。记者叫玛丽亚·亨德森，金发，脸上有风沙，口罩拉到下巴上，对着麦克风说话——那样戴口罩等于没戴，我当时还想着。<\/p>\n          <p>她在念 GOC 的通告：还没撤离的居民，请尽快用一切可用材料把自己封在家里。<\/p>\n          <p>她身后有个医生站起来，很急，冲着床边的士兵喊：“有人到期了！把橡皮擦拿来！”<\/p>\n          <p>亨德森开始往帐篷外走。她一边走一边念：还在污染区的人，请留意身边的人，如果亲友开始散发出明显的薄荷味，请立刻隔离——<\/p>\n          <p>她念到“薄荷”两个字，信号就没了。屏幕变成一片蓝，然后黑。<\/p>\n          <p>我换了十几个台，全是黑的。我又换了广播，还有几个频段在响，响的是噪声。<\/p>\n          <p>后来我知道，全世界是在同一秒断的。互联网也断了。整个星球在几秒钟内瞎了。<\/p>\n          <p>“薄荷味”这三个字我记了很久。我一直想弄清楚那是什么——是某种气味的诱因，还是某种生化武器让人闻起来的味道。档案里没有写。也许写的人也不知道，也许知道的人已经死了。<\/p>\n          <p>我后来在路过的一座小镇上，闻到过一次类似的味道。那天风很大，我以为是洗洁精。走了两条街我才反应过来，那是从一间关着的房子里面飘出来的。<\/p>\n          <p>我没有进去。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十五章 猫", "html": "<p>我得说一件我很不想说的事。<\/p>\n          <p>小时候我老生病，一年里有半年在家躺着，出不了门。那时候我特别迷侦探故事，福尔摩斯那一套，什么都想弄明白。<\/p>\n          <p>我家墙外有一排花盆，我爸种的。它们老是被什么东西撞翻，土撒一地。我爸查了一个月，查不出来，越查越烦。<\/p>\n          <p>那阵子正是我迷侦探迷得最厉害的时候，所以我自告奋勇。我那时候是个蠢货，什么也推不出来，最后我买了一台便宜的摄像头，对着墙，录了一整夜。<\/p>\n          <p>是一只野猫。<\/p>\n          <p>我把录像给我爸看。他看完，出门，找到那只猫，踢死了。踢了很多下。<\/p>\n          <p>我早该知道他就是这样的人。他打我的时候也是这样。<\/p>\n          <p>这件事我很多年没想过。后来在沙漠里走夜路的时候，它突然回来了。<\/p>\n          <p>好奇心。所有人都知道那句老话，但没人真信。所有牵扯进来的人，本来都会过得更好，只要我别多管闲事。除了我爸——去他的。<\/p>\n          <p>但我还是要去 Site-19。<\/p>\n          <p>因为我发现，比起死在路上，我更受不了坐在那间安全屋里等。等到最后，什么都不知道，连自己是怎么死的都不知道。那比死难受。<\/p>\n          <p>我是个游客，在世界尽头。目的地：Site-19。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十六章 检查", "html": "<p>离开安全屋第四天，我在一片林间空地上看见了他们。<\/p>\n          <p>九个人，站成一排。第十个是指挥官，一个女人，在队伍前面来回踱步，靴子踩在落叶上，声音很轻。制服和臂章是机动特遣队 Epsilon-6「乡里愚人」。<\/p>\n          <p>我在两百米外的坡上，趴着，透过护具的视觉增强看他们。<\/p>\n          <p>指挥官停下，拍了一下手，走到第一个士兵面前。<\/p>\n          <p>“现在做检查。”<\/p>\n          <p>“当然。”<\/p>\n          <p>她拿出一把刀，捅进他的肩膀，抽出来。刀上带血。那个士兵站得笔直，脸上没有任何变化。<\/p>\n          <p>“去处理伤口。”<\/p>\n          <p>士兵点头。她走向第二个。<\/p>\n          <p>我起初以为这是在惩罚，或者在测试忠诚。可她的动作太机械了：捅、抽、走开，捅、抽、走开。第三个，第四个，第五个。每个人的肩膀上都多一个洞，每个人都不动。<\/p>\n          <p>到第八个的时候，那个人闷哼了一声，肩膀缩了一下。<\/p>\n          <p>“抓到一个活的！”<\/p>\n          <p>所有人立刻抬枪。九支枪同时响。那个人倒下去，倒在自己刚才站的位置上。<\/p>\n          <p>指挥官面不改色。她走到第九个面前，捅进去，抽出来。没有反应。<\/p>\n          <p>“好，清了。出发。”<\/p>\n          <p>他们收拾物资走了，把那具尸体留在原地。<\/p>\n          <p>我在坡上趴了半个小时才敢下去。我从尸体上拿了一把步枪、两个弹匣、一个急救包。然后我挖了个坑，把他埋了。<\/p>\n          <p>我在日志里写：没有线索。我不知道这算什么。<\/p>\n          <p>其实我知道。我只是不敢往那个方向想。<\/p>\n          <p>他们不是在找出叛徒。他们是在找出**还会疼的人**。<\/p>\n          <p>找到一个，就杀掉。<\/p>\n          <p>因为还会疼的人，还是人。<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十七章 七、五", "html": "<p>那天晚上我在一个废弃的护林员小屋里过夜，捡到一台旧收音机。<\/p>\n          <p>我调到某个频段，听见一个男人的声音，听起来和我差不多年纪。<\/p>\n          <p class=\"block\">七。五。你能听见吗？你的眼皮之间有洞，洞里在发光。我从没去过凡尔赛。我想被爱。<br>九。我现在站在你身后。五。我是我们两个，现在站在你身后。女神在吃海里的那座城。<br>九。地板上有个洞，洞里有个答案在等着。<br>七。看，你在孵化。你在孵化！<\/p>\n          <p>这段话在循环。我听了三遍，第四遍的时候把它关掉。关掉之后我发现这台机器的外壳裂了，内部短路，根本不可能收到任何东西。<\/p>\n          <p>我坐在那儿，忽然想不起来自己刚才是不是真的听见了。<\/p>\n          <p>我在日志里写：我没事吧？<\/p>\n          <p>然后我写了一句很蠢的话：<\/p>\n          <p class=\"quote\">哦对了，这东西还能存照片？<\/p>"}, {"vol": "卷二 · 食堂", "title": "第十八章 走进蛇窝", "html": "<p>从安全屋到 Site-19，走路要三周。<\/p>\n          <p>我原本以为很近，那是开车的时间。可我不能开车：就算我看不见自己，车也看得见。一辆车在没人的公路上跑，只要有一个人或者一个异常项目看见它，我就完了。<\/p>\n          <p>所以我在林子里走。护具让我不被认出来，但它不能让我跑得更快。有东西冲过来的时候，我躲不开——它看不见我，但它照样能把我撞死、踩死。<\/p>\n          <p>走路有很多时间想事情。我想的最多的是：我去 Site-19 到底要干什么。<\/p>\n          <p>如果我想活得久，我应该往反方向走，离所有基金会的人越远越好。<\/p>\n          <p>我不是不知道这个道理。我只是停不下来。<\/p>\n          <p>答案。我要一个答案。<\/p>\n          <p>就算拿到答案之后我被人一脚踢死，我也认了。<\/p>"}, {"vol": "卷三 · 世界是怎么死的", "title": "第十九章 橡皮擦", "html": "<p>玛丽亚·亨德森四十一岁，跑了十七年突发新闻。她见过地震、海啸、战争、瘟疫，她知道灾难是什么样子：先是声音，然后是气味，然后是秩序。<\/p>\n          <p>2020 年 1 月 5 日，她在特隆萨郊外。那里原来是一个农场，两天之内变成了一座帐篷城。GOC 在 1 月 3 日就设了疏散线，但线划得太慢，人跑得比线快。<\/p>\n          <p>她那天早上采访了三个人。第一个说他的邻居在半夜开始散发出一种“像牙膏”的味道；第二个说他妻子的皮肤在摸起来像湿纸；第三个什么都不说，只是坐着。<\/p>\n          <p>下午两点，医生开始喊“到期”。这是 GOC 的术语，她后来才明白是什么意思：一个人被感染之后有一个固定的时间窗口，窗口一过，这个人就不再是这个人了。那时候要做的不是救治，是“橡皮擦”——一种声波与热处理的联合程序，把帐篷里的一切清空，包括帐篷本身。<\/p>\n          <p>她在帐篷里直播。她的口罩拉到下巴，因为要把声音送进麦克风。这个细节她自己也觉察到了，她只是在那一刻觉得，戴着口罩说话，观众会听不清。<\/p>\n          <p>“还在污染区的人，”她对着镜头说，“请留意身边的人。如果你的亲友开始散发出明显的薄荷味——”<\/p>\n          <p>信号在这一句中断。<\/p>\n          <p>她后来回忆，那一刻她听见帐篷外面有很密的 buzzing 声，像有一万只蜂在远处。她跑出帐篷，看见一排帐篷的顶上喷出浓烟，闪灯。她跑到第二排，第三排，每一个帐篷都在做同样的事。<\/p>\n          <p>她站住了。她突然明白，所谓“疏散线”，不是把人挡在外面，是把人挡在里面。<\/p>\n          <p>那天之后，电视在所有地方停播。她在 GOC 的卡车里待了十天，用一台卫星电话给编辑部发稿，发了七篇，一篇都没发出去。第八天，电话的电用完了。<\/p>\n          <p>她在甘齐尔被接纳，登记为“非战斗人员，编号 R-217”。她在那里待到城破。<\/p>"}, {"vol": "卷三 · 世界是怎么死的", "title": "第二十章 两小时", "html": "<p>德里是 1 月 6 日傍晚。<\/p>\n          <p>SCP-610 的样本被释放的方式，后来在 GOC 的调查里还原出三种可能：地铁通风口、两座水厂的进水口、以及一名在社区医院工作的基金会潜伏人员。三种可能同时成立——这不像一次释放，像一次设计好的布局。<\/p>\n          <p>第一个报告来自一个卖蔬菜的小贩。他说街角有个人“在融化”。警察到场之后，那条街被封了。封街用了二十分钟。二十分钟后，那条街后面三条街也被封了。<\/p>\n          <p>阿米娜·库尔希德那天在家。她三十四岁，是两个孩子的母亲，住在老城区一栋四层楼的三楼。她丈夫在城另一头上班，电话打不通。<\/p>\n          <p>她做了所有母亲会做的事：把孩子带进卧室，把衣柜清空，让八岁的女儿和四岁的儿子进去，给他们一瓶水、两包饼干、一只手电，然后把柜门关上，用钥匙锁了，把钥匙从门缝底下塞进去。<\/p>\n          <p>“妈妈呢？”女儿在里面问。<\/p>\n          <p>“妈妈在门口。”<\/p>\n          <p>她坐在衣柜前的床上，坐了两个小时。楼下的声音从喊叫变成别的东西。她听见有人在走廊里走，走得很慢，拖着一只脚。<\/p>\n          <p>她把床单撕成条，塞住门缝，然后继续坐着。<\/p>\n          <p>衣柜里没有声音了。她把耳朵贴在柜门上听过一次，听见儿子在数数。她松了口气，又立刻恨自己松了口气。<\/p>\n          <p>后来 GOC 的清理队在这一带工作了六天。他们在那栋楼的三楼找到两个活着的孩子，和门外一具已经辨认不出的人类遗体。<\/p>\n          <p>调查报告里对这一段的描述只有一句：<\/p>\n          <p class=\"quote\">遗体姿态为坐姿，面朝衣柜门。<\/p>\n          <p>两个孩子被送往甘齐尔。他们后来在城破时失踪，档案里没有记载后续。<\/p>"}, {"vol": "卷三 · 世界是怎么死的", "title": "第二十一章 熊", "html": "<p>巴黎是 1 月 9 日。<\/p>\n          <p>SCP-1048 是怎么被基金会抓住的，档案里没有说。它在 1 月 9 日之后出现在巴黎，但从直升机拍到的画面看，它不是一个，是一群。<\/p>\n          <p>画面只有四十七秒，抖得很厉害。塞纳河右岸的一条街上，几百只由 1048 造出来的熊在跑，个头和狗差不多，跑起来像一团团棕色的水。它们钻进楼房，从窗口出来，再钻进下一栋。<\/p>\n          <p>街尽头有一只很大的，红的，像游乐场里那种奖品格子，站起来比旁边的楼还高。它走得很慢，每走一步，街边的一排路灯就灭一盏。<\/p>\n          <p>拍这段画面的人是一个摄影师，他当时在天台上。四十七秒之后他停止了拍摄。这一段之后是他自己的一段喘息，一共十一秒。再之后什么都没有。<\/p>\n          <p>巴黎在 1 月 11 日被 GOC 列为“不可回收区域”。这个词的意思是：不再派人进去。城市里的人自己想办法，想不出来的就留在那里。<\/p>\n          <p>同一时期，地球另一边的卡拉哈里、西伯利亚、安第斯山脉，都出现了类似的事情，只是没有人拍下来。人类在这一周里失去了对城市的控制权，只是没有人用“失去”这个词——因为没有人还有余力宣布任何事。<\/p>"}, {"vol": "卷三 · 世界是怎么死的", "title": "第二十二章 海", "html": "<p>甘齐尔是一座城，建在大西洋上，钢筋与混凝土的环形结构，设计容纳四千万人。它是 GOC 在一百年前为了“世界末日场景”建的，设计寿命两百年。它在 2020 年 1 月 12 日宣布关闭大门。<\/p>\n          <p>这个决定是 GOC 秘书长签的。签之前，城内人口已经到了一千一百万，是设计容量的四分之一，但物资只够三个月。<\/p>\n          <p>关闭大门的通知用十七种语言播了四十八小时。通知里说：城内已达到安全容量上限，请尚未进入的民众前往内陆高地。<\/p>\n          <p>通知播完的第二天，城外的浮桥上聚集了大约二十万人。他们没有冲门，也没有喊。他们只是站在那里，看着那扇门。<\/p>\n          <p>GOC 内部对这件事的记录很短：<\/p>\n          <p class=\"block\">1 月 13 日 06:00，外环浮桥人群聚集，未发生冲突。<br>1 月 14 日 22:00，外环浮桥人群减少约四成，原因为没有新增抵达者。<br>1 月 16 日，外环浮桥已无聚集。<\/p>\n          <p>那二十万人去了哪里，记录里没有写。后来有人在城内的档案里找到一份未采用的方案，方案里管这件事叫“静默转移”。方案正文只有一页，第二页缺失。<\/p>\n          <p>从这一天起，甘齐尔成了这个星球上最后一座“还有秩序”的城市。往后四十天，所有的抵抗都从这座城里发出，所有的希望也从这座城里发出。<\/p>\n          <p>而基金会在这四十天里，只做了一件事：把它围住。<\/p>"}, {"vol": "卷三 · 世界是怎么死的", "title": "第二十三章 光缆", "html": "<p>1 月 18 日，破碎之神教会在北欧的一处地下设施里，把互联网重新接通了。<\/p>\n          <p>严格来说，不是互联网。是十七个节点、四千多公里的光缆、一套临时的路由协议。覆盖范围不到原来的百分之一，但够用：他们用它协调物资，发布通告，让分散的幸存者知道彼此还在。<\/p>\n          <p>网络恢复的第三天，有人在上面传了一段视频。视频里是一个机械装置，看起来像一台旧式打印机，在无人值守的地下室里工作，打印了一页纸，然后把纸吃掉，再打印一页。<\/p>\n          <p>那是 SCP-3078。<\/p>\n          <p>四十八小时内，这段视频被上传到所有还能用的信道里，副本数以万计。每一个看到的人都会在几小时后开始做同一件事：用能找到的一切材料，复制那个装置。<\/p>\n          <p>教会的人在 1 月 21 日切断了网络。他们说这是唯一的选择。切断之后，那些已经看过视频的人还在继续做，一直做到材料用完。<\/p>\n          <p>1 月 22 日，网络再没有恢复过。<\/p>\n          <p>人类历史上，这是文明第一次不是因为失去了什么而死，而是因为看见了什么而死。<\/p>"}, {"vol": "卷三 · 世界是怎么死的", "title": "第二十四章 静默", "html": "<p>1 月 24 日，莫斯科时间下午四点十七分，地球上的最后一台公共广播发射塔停止工作。<\/p>\n          <p>没有人关掉它。是它自己停的：发电机没有油了，而负责补给的人在前一天死在了路上。<\/p>\n          <p>那一刻，全球还有大约四千万人在呼吸。他们中的绝大多数并不知道自己已经进入了一个没有声音的时代。他们只是发现，手里的设备不再有反应，天上的飞机不再经过，远处的城市不再有光。<\/p>\n          <p>文明不是被一拳打死的。它是被一双手，一根一根，把线抽掉。先是信号，然后是电，然后是水，然后是夜里能看见的那点人造的亮。<\/p>\n          <p>到最后，剩下的东西非常简单：人，和天黑。<\/p>\n          <p>有些人开始重新学着生火。有些人开始重新学着埋人。有些人开始重新学着在夜里小声说话，因为大声说话会引来东西。<\/p>\n          <p>而在这一切之下，还有一件事在悄悄地进行——那些从基金会里出来的人，正在一个接一个地，把这片大陆上剩下的人清干净。他们不需要宣传，不需要组织，不需要补给。他们只需要名单。<\/p>\n          <p>名单是有的。基金会有一百年的人事档案。<\/p>"}, {"vol": "卷四 · 甘齐尔", "title": "第二十五章 欧罗巴", "html": "<p>甘齐尔的指挥部在 E 环第七层，一间没有窗的房间，墙上挂着一张九米长的地图。地图不是地球，是围城态势：内环、外环、浮桥、基金会已经控制的海岸线、已经被放弃的三座港口。<\/p>\n          <p>指挥官莫里森四十六岁，军人家庭出身，说话快，习惯用短句。他在 1 月 17 日接手防御，第一件事是把地图换成这张。<\/p>\n          <p>他的副手告诉他：基金会没有全面进攻。他们在外环布了七个点，每个点都不大，但每个点都有一件东西。<\/p>\n          <p>“什么东西？”<\/p>\n          <p>“不知道。卫星看不到。我们的人过去，回来的人说那里‘什么都没有，但你走进去就会想死’。”<\/p>\n          <p>莫里森在那张地图前站了很久。<\/p>\n          <p>科学家罗兹博士是 GOC 的异常武器顾问，五十二岁，戴眼镜，手指上常年有墨水。她在 1 月 19 日给莫里森做了一次简报，那次简报只有十分钟，但改变了整场围城。<\/p>\n          <p>“他们不是在围我们。”罗兹说，“他们是在等。”<\/p>\n          <p>“等什么？”<\/p>\n          <p>“等我们把自己的城墙吃光。”罗兹指了指地图内环的一处标记，“克劳教授的欧罗巴在我们脚底下，从一月六号开始就在长。它在长，是因为它是活的，而活的东西在封闭空间里只有一件事可做：找出口。”<\/p>\n          <p>莫里森问：“还有多久？”<\/p>\n          <p>“我不知道。三十天，也许二十天。”罗兹说，“我们可以在它长到城墙之前把它炸掉，但那样内环会塌一半，我们会死大概一千万人。”<\/p>\n          <p>“那就炸。”<\/p>\n          <p>“还有别的选项。”罗兹说，“我们可以往上长。开一条通到海面的口子，让它从水里出去。那样它会离开，城能保住，但我们会失去对它的追踪。”<\/p>\n          <p>莫里森盯着地图看了两分钟。<\/p>\n          <p>“你的建议是什么？”<\/p>\n          <p>“我的建议是，我们先弄清楚基金会到底为什么要杀人。”罗兹说，“围城是有目的的。他们在等某件事发生，而那件事可能跟我们怎么打无关。”<\/p>\n          <p>那天晚上，莫里森批准了一项行动：抓一个活口，一个能说话的活口。<\/p>"}, {"vol": "卷四 · 甘齐尔", "title": "第二十六章 活口", "html": "<p>行动在 1 月 23 日夜间进行。目标是一支试图混在难民里进入外环的基金会小队，五个人，穿着平民衣服，带两件小型异常装备。<\/p>\n          <p>交火持续了四分钟。三个人死了，一个人重伤，一个人被活捉。<\/p>\n          <p>被活捉的那个人在被按倒在地时，做了一件很奇怪的事：他笑了。不是那种被抓住之后的苦笑，是真的觉得好笑，像看了一个不好笑但很好玩的笑话。<\/p>\n          <p>他叫塞缪尔·罗斯，三十八岁，机动特遣队 Omega-2「守密人」的成员。Omega-2 是基金会内部级别最高的特遣队之一，专门负责处理不能被人知道的事情。<\/p>\n          <p>审讯安排在 1 月 24 日下午，地点是内环 D 区的一间审讯室。房间没有窗，只有一张桌子、三把椅子、一台录音机。<\/p>\n          <p>在此之前，GOC 审讯过十一个基金会俘虏。十一个人，没有一个开口。有的骂，有的沉默，有的在审问开始前就自己咬断了舌头。莫里森原本以为这次也一样。<\/p>\n          <p>罗兹在开始前做了一次扫描。她的设备是从甘齐尔的医疗库里调出来的，用于检查“认知植入”：脑内异物、模因触发器、认知危害的残留。<\/p>\n          <p>扫描结果：无异物，无触发器，无认知危害残留。<\/p>\n          <p>“他是干净的。”罗兹说，“至少从我们的仪器能看得出来的意义上。”<\/p>\n          <p>莫里森点点头，拉开椅子坐下。录音机开始转。<\/p>"}, {"vol": "卷四 · 甘齐尔", "title": "第二十七章 蒂内里费的海鸥", "html": "<p>“你知道你在哪儿吗？”莫里森问。<\/p>\n          <p>“甘齐尔，对吧？”罗斯说，“你们抓我们的时候，我们正往城里钻。”<\/p>\n          <p>“对。你知道你为什么在这儿吗？”<\/p>\n          <p>“你们要审我，我猜。”<\/p>\n          <p>短暂的停顿。莫里森看了罗兹一眼。<\/p>\n          <p>“确认。”罗兹说，“对象体内无植入物，无精神制剂，也无认知危害。可以开始。”<\/p>\n          <p>“好。”莫里森说。<\/p>\n          <p>他把手放在桌上，身体前倾。<\/p>\n          <p>“我们审过你的同事。”他说，“一个都没说话。一个都没有，一个字都没有。你为什么现在愿意跟我说话？”<\/p>\n          <p>罗斯看着他，眼睛很平静。那种平静不太对——不是恐惧被压下去的那种，是真的什么都没有。<\/p>\n          <p>“我们见过。”罗斯说，“你记得吗？”<\/p>\n          <p>“抱歉？”<\/p>\n          <p>“几年前，蒂内里费的那次联合行动。跟那个海鸥王子有关的那次。”罗斯说，“我当时戴着防毒面具，你大概认不出我。但我认出你了。我当时笑了一下。”<\/p>\n          <p>莫里森没有立刻说话。他想起来了：三年前，一次针对某个异常实体的联合收容，GOC 出人，基金会出情报，两边在港口的一间仓库里待了十四个小时。有个基金会的人一直站在角落，戴面具，不说话。<\/p>\n          <p>“就为这个？”莫里森问。<\/p>\n          <p>“对。”<\/p>\n          <p>“就因为你认出了我，你就愿意说话？”<\/p>\n          <p>“对。”<\/p>\n          <p>莫里森把椅子往后推了半寸。<\/p>\n          <p>“我们抓到你们的时候，你们正跟难民一起往城里挤。你和你的同伴往人群里开枪。男人、女人、孩子，全杀了，没有理由。”他说，“你不觉得这很疯吗？”<\/p>\n          <p>罗斯笑了。<\/p>\n          <p>罗兹低着头，很小声地说了一句脏话。<\/p>\n          <p>“这很好笑？”莫里森问。<\/p>\n          <p>“抱歉，我不是想失礼。”罗斯说，“我只是觉得……这话有点虚伪。”<\/p>\n          <p>“什么？”<\/p>\n          <p>“你看，你审我，好像我给你的东西能帮上忙。”罗斯说，“可按我看，你根本没有时间做任何事。不管你把她放出去多少次，克劳教授的欧罗巴迟早会把这座城从里面撕开。你们还在表现得像能改变什么。”<\/p>\n          <p>他停了一下。<\/p>\n          <p>“你不觉得这很疯吗？”<\/p>"}, {"vol": "卷四 · 甘齐尔", "title": "第二十八章 不该疼", "html": "<p>莫里森的手在桌下握紧了。<\/p>\n          <p>“你要是只想说这些废话，”他说，“我们也可以换一种方式问。我不想，但我会做。”<\/p>\n          <p>“随你。”罗斯说，“一旦你想明白自己不该感到疼，就没有什么可怕的了。”<\/p>\n          <p>“你什么意思？”<\/p>\n          <p>罗斯抬起眼睛看他。<\/p>\n          <p>“你……”<\/p>\n          <p>他停住，像在斟酌。<\/p>\n          <p>“不，你不会想让我说的。”<\/p>\n          <p>“我非常想。”<\/p>\n          <p>“我不是在跟你说话。”罗斯说。<\/p>\n          <p>莫里森看了罗兹一眼，罗兹耸了一下肩，意思是：我不知道他在说什么。<\/p>\n          <p>“这说不通。”莫里森说，“现在告诉我。”<\/p>\n          <p>“……你确定？”<\/p>\n          <p>“我们的接种还管用吗？”莫里森问罗兹。<\/p>\n          <p>“所有已知的基金会杀灭制剂都清过了，是。”<\/p>\n          <p>“那你就说出来，罗斯。别拖，不然我们只能不客气。”<\/p>\n          <p>罗斯看着他们两个人，看了很久。他的表情在这段时间里第一次变了——不是害怕，是一种近似于怜悯的东西。<\/p>\n          <p>“好。”他说，“我劝过你们了。”<\/p>\n          <p>然后他说了一句话。<\/p>\n          <p>那句话在录音带上是一段很长的空白，长度十一秒。事后 GOC 的技术人员做过频谱分析，结论是：那十一秒里，录音机在工作，磁带在走，但没有任何声波被记录。<\/p>\n          <p>不是没有声音。是那个声音不能成为声音。<\/p>\n          <p>“我……我没听清。”莫里森说。<\/p>\n          <p>“你得大点声。”罗兹说，“这麦克风的增益就只有这么多。”<\/p>\n          <p>罗斯又说了一遍。<\/p>\n          <p>档案上，这一段的位置写着四个字：<span class=\"small\">[信息已被切除]<\/span>。<\/p>"}, {"vol": "卷四 · 甘齐尔", "title": "第二十九章 三分钟", "html": "<p>录音带的第 41 分 12 秒之后，是尖叫。<\/p>\n          <p>先是莫里森，很低，像一个人突然被人在背后推了一把。然后是罗兹，更高，更细。两个人的声音叠在一起，中间夹着湿润的断裂声——不是骨头，是别的东西。还有风声，很急的风，可那间审讯室没有窗。<\/p>\n          <p>尖叫持续了三分钟。音高在往上走，越来越高，到后面已经不像人声，像某种金属在摩擦。<\/p>\n          <p>在这三分钟里，罗斯一直没有说话。<\/p>\n          <p>直到录音带的第 44 分 07 秒，他才开口。他的声音很平静，甚至有点疲惫，像一个已经把这件话说了一百遍的人。<\/p>\n          <p>“看看你们把自己弄成什么样了。”他说，“我说过你们不会喜欢的，对吧？这就是为什么你们能听见自己的声音。”<\/p>\n          <p>停顿。<\/p>\n          <p>“可你们太想知道了。”<\/p>\n          <p>“我挺喜欢你们这些人的，所以我才想客气一点。”<\/p>\n          <p>“我们对你们很温柔，你知道的。我们在光里战斗，好让你们在黑暗里死。”<\/p>\n          <p>停顿。录音带还在转。<\/p>\n          <p>最后他说了一个词。<\/p>\n          <p class=\"center\">“恶心。”<\/p>\n          <p>录音在这里结束。技术报告写：磁带在 47 分 22 秒处停止，之前有大约四十秒的空白，空白里可以听见远处有警报声。<\/p>\n          <p>那份技术报告的最后一页夹着一张便条，是当天负责整理磁带的人写的：<\/p>\n          <p class=\"quote\">我不建议任何人单独听这一段。我听了，现在正在走廊上坐着。我想我需要有人陪我一会儿。<\/p>"}, {"vol": "卷四 · 甘齐尔", "title": "第三十章 从里面", "html": "<p>审讯室里后来发生了什么，没有完整的记录。<\/p>\n          <p>D 区的监控在当天 15 时 02 分开始出现画面撕裂，持续了十九分钟。恢复之后，审讯室的门是从里面被撞开的，门框变形，像有什么东西从里面顶了一下。<\/p>\n          <p>里面没有人。<\/p>\n          <p>罗斯不见了。桌椅不见了。录音机留在原地，磁带完整。<\/p>\n          <p>墙上有三道很长的划痕，从天花板一直到地面，深约两厘米，边缘光滑，不像刀，也不像爪。<\/p>\n          <p>清理队在两个小时后封锁了整个 D 区。莫里森和罗兹的名字出现在当天的失踪名单上。名单是手写的，字迹是值班军官的。<\/p>\n          <p>三天后，甘齐尔的内环出现第一道裂缝。裂缝从地下九层一直延伸到地面，宽的地方可以并排走过两个人。从裂缝里出来的东西，档案里叫“欧罗巴的外缘”。<\/p>\n          <p>2 月 26 日，城破。<\/p>\n          <p>破的方式，据后来收容在 GOC 残部手里的记录，是这样的：<\/p>\n          <p class=\"block\">2 月 26 日 03:10，内环 E 段与 D 段同时发生结构性断裂。<br>03:40，外环东侧遭基金会集中攻击，使用至少十二件高等级异常项目。<br>04:00，城内通讯中断。<br>06:00，GOC 指挥部下令弃城。<br>06:20，指挥部信号消失。<\/p>\n          <p>城是从里面和外面一起被毁的。里面的那个东西往上长，长穿了所有的地板；外面的那些东西往里压，压穿了所有的墙。两边没有配合，也不需要配合——它们的目标一致。<\/p>\n          <p>那天早上，玛丽亚·亨德森在 D 区的走廊里跑。她跑过一间开着的审讯室，看见里面的墙上那三道划痕，停了一秒，然后继续跑。<\/p>\n          <p>她后来在救生艇上写了一段话，这段话没有发出去，写在一张药品说明书背面：<\/p>\n          <p class=\"quote\">我一直以为我们要对抗的是疯子。现在我怀疑，我们要对抗的是一句真话。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十一章 三个月", "html": "<p>从 Site-19 出来之后，我有一段东西，我到现在也想不起来。<\/p>\n          <p>我在日志上翻过一遍：Site-19 的最后一条记录写的是“准备再调查一些东西”，然后就没有了。下一条记录的日期是三个月后，字迹歪歪扭扭，我都不太认得出是自己的手。<\/p>\n          <p>那三个月里，文件被删了。是我自己删的，因为只有我有权限碰那些文件。这一点我确定，虽然我完全不记得自己做过。<\/p>\n          <p>我醒过来的时候在一个加油站，身上有几道疤，太阳穴上缠着绷带，护具完好。我不知道自己在哪儿，也不知道时间过了多久——加油站墙上的日历停在三月，我以为是去年的三月。<\/p>\n          <p>我照了一下后视镜。镜子里那个人瘦得像另一个人。眼窝陷下去，嘴角有一道很深的竖纹。我三十一岁，看起来四十五岁。<\/p>\n          <p>然后我发现我手里有一个手提箱。<\/p>\n          <p>黑色的，硬壳，不重。我知道里面是什么——不，我不知道。我只知道它叫 SCP-055，而我要把它送到 SCP-579。<\/p>\n          <p>写下来的时候我自己都觉得这句话荒谬。可我确实知道该往哪儿走，就像有人在我脑子里画了一张地图，还顺手把我\"为什么\"的那一部分给擦了。<\/p>\n          <p>我在加油站坐了一整天，试着和自己对话。<\/p>\n          <p>“你为什么要送它？”<\/p>\n          <p>“因为我得送它。”<\/p>\n          <p>“为什么？”<\/p>\n          <p>“……因为我得送它。”<\/p>\n          <p>这就是我能得到的全部答案。像一台机器，你问它为什么转，它说因为它转。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十二章 跳过键", "html": "<p>手提箱有一个用法，我是自己发现的：在我撑不下去的时候，可以打开它。<\/p>\n          <p>打开之后，下一件我意识到的事，是我站在几英里外，胸口暖洋洋的，像刚被人拍过肩膀说“干得好”。<\/p>\n          <p>第一次打开是在四月的某个下午。我在一条公路边上坐了三个小时，动不了。前面是六具挂在电线杆上的尸体，风一吹，他们轻轻地碰在一起，发出很轻的木头声音。后面是来时那条路，路上什么都没有。<\/p>\n          <p>我打开了箱子。<\/p>\n          <p>然后我在二十公里外。<\/p>\n          <p>我没有骗自己：这就是我个人版的跳过键。游戏里那种，剧情太长、你可以按一下跳过去的东西。<\/p>\n          <p>但它有代价。每按一次，我往前走得就少一点，身体就差一点。到第五次的时候，我打开箱子之后在原地站着吐了半小时。到第八次，我开始分不清\"上一秒\"和\"上个月\"。<\/p>\n          <p>第九次之后，我不太敢再用它了。不是因为身体，是因为我隐约觉得，这个东西正在把我身上某个很要紧的部分，一点一点换掉。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十三章 海螺", "html": "<p>我是在一家废弃的珠宝店里遇见他的。<\/p>\n          <p>门开着，里面有人生了火。火光把玻璃柜台照得像结了冰。一个人坐在柜台后面的地板上，背对着我。<\/p>\n          <p>我关掉了感知过滤，因为我想跟人说话。我走进门，说了声“打扰了”。<\/p>\n          <p>他转过身，跳起来，抓起一根锈铁管。<\/p>\n          <p>他的脸不是脸。是一副马蹄蟹的壳，从领口以上整个换掉了，壳上还有细小的、还在动的附肢。我不知道那是什么原理。我也没问。<\/p>\n          <p>“你是谁？”他喊。<\/p>\n          <p>“我……我认出你了。”我说，“我见过你的照片。”——我看到的是档案里的照片，Site-19 的前任副主管，哈洛德·贝克。那是一个头发花白、戴细框眼镜的男人。<\/p>\n          <p>他愣了一下，把铁管放下。<\/p>\n          <p>“操。”他说，“你是来杀我的？我劝你别。”<\/p>\n          <p>“不是。我也跑出来了。”我说，“你也跑出来了？”<\/p>\n          <p>他凑近看我的脸。火光下他的壳上映出一点橙色。<\/p>\n          <p>“老天。”他说，“你看上去糟透了，伙计。你上次睡觉是什么时候？”<\/p>\n          <p>“这护具……穿着它不用睡。”<\/p>\n          <p>“人是要睡的。你这张脸，说真的，是场灾难。看着都难受。”<\/p>\n          <p>我们坐在柜台两边的地板上。他给我一瓶啤酒，是他藏了很久的。我不敢喝，怕被污染。他说“随你”，自己灌了一大口。<\/p>\n          <p>我问他第二份文件的事。我知道他一定读过。<\/p>\n          <p>“读过。”他说，“一堆图片。蛋、树、宗教的那些东西。单看没什么。但我猜里面编了东西。”<\/p>\n          <p>“是模因吗？”<\/p>\n          <p>“不知道。”他皱着眉，“我挨过的模因不少，我知道那是什么感觉。这个不是。更像是……有什么东西从你身上被松开了。”<\/p>\n          <p>“那你还记得里面是什么吗？”<\/p>\n          <p>“不记得了。”他说，“我这类人记不住它。”<\/p>\n          <p>我追问“你这类人”是什么意思。他摇了摇头。<\/p>\n          <p>“你不想知道。”<\/p>\n          <p>沉默了一会儿。他说明天他要去 1437，试试能不能往另一个宇宙里撒泡尿。我说我要去 579。他笑了，说想死的话有更简单的办法。<\/p>\n          <p>天亮前他站起来，走到门口，停了一下。<\/p>\n          <p>“至少，希望你找到你要找的。”<\/p>\n          <p>我说，“我也希望。”<\/p>\n          <p>他没有回头。他走出去，走进那种很薄的、天快亮时的蓝里。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十四章 盲行者", "html": "<p>那之后的东西，我统称为“盲行者”。<\/p>\n          <p>它们是雕像，士兵的样子，穿特遣队的制服，手臂被刻成刀刃，像螳螂那样。眼窝是空的。<\/p>\n          <p>你看着它们，它们就不动。你一转开眼，它们就动，而且很快。<\/p>\n          <p>我第一次看见它们是在一处被烧过的营地。一个士兵倒在帐篷门口，脖子上的口子整齐得像被尺子量过。我抬头，看见立在烟里的那一座。<\/p>\n          <p>我盯着它，慢慢往后退。它没有动。我知道它为什么不动：因为我在看它。<\/p>\n          <p>我也知道它在做什么：它在推算。它看不见我，可它知道有一个人正盯着它看——因为它的规则需要有人看。所以它知道我在哪儿，只是不知道我是谁。<\/p>\n          <p>这个区别救过我的命，也差点要了我的命。因为一旦我眨眼，或者被一团烟挡住视线，它就自由了。<\/p>\n          <p>后来在一个镇子上，我看见它做过一次那种事：一阵烟雾从街角滚过来，挡住它两秒。两秒之后烟散了，街上原来站着的人，全都在地上，整整齐齐，像被收割过。<\/p>\n          <p>我学会了绕开。走远路，绕山，宁可多走两天。这三个月里我绕的路，比直走多了一倍。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十五章 天被拉长了", "html": "<p>还有一样东西，我只见过一次，隔着很远。<\/p>\n          <p>它在天边，像一个人被拉长——这个说法不对。更像是它周围的空间被拉长了，它跟着一起被拉。身体从地面一直伸到云里，下巴张成一个直角。它身体周围有一些空隙，黑色的，像翅膀那样张开。它就那样往前飘。<\/p>\n          <p>它下面有基金会的人。他们在打它。开枪，放火箭。它被击中，就稍微弯一下，然后继续飘。<\/p>\n          <p>我在远处的坡上看了很久。我心里有个很怪的想法：<span class=\"small\">基金会居然在打异常项目。<\/span><\/p>\n          <p>这三个月里我第一次感觉到一点别的东西——不是希望，是很小的一点错位感。就像你一直以为自己在看一场屠杀，忽然发现屠杀者也在被人杀。<\/p>\n          <p>我想过要不要过去，跟他们说话。也许他们也是跑出来的，也许他们也想找个活人。<\/p>\n          <p>我没有去。我怕。<\/p>\n          <p>我后来常常想起这个决定。我不确定如果我当时走过去，会不会有什么不同。大概不会。大概什么都不会不同。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十六章 六十二 C", "html": "<p>Site-62C 在山上，海拔一千八百米。我走到它面前的时候，已经是十二月。<\/p>\n          <p>没有守卫。所有安检门都开着，红灯不亮。这地方曾经是基金会最高优先级的站点之一，我在 ES-06 的内部通告里见过它的编号，那时候它后面跟着三个星号。现在它像一间被搬空的房子。<\/p>\n          <p>我站在大门外，抬头看那栋楼。它不高，混凝土，表面有很多年冻裂的痕。风很大，雪被吹成一道道横着的线。<\/p>\n          <p>我离它还有两百米的时候，后脑勺突然紧了一下。<\/p>\n          <p>那种感觉我很熟：有人拿枪顶着你的后脑。我回头，身后没有人，没有车，没有声音。<\/p>\n          <p>再往前走了五十米，我又感觉到一次。这次不是枪，是别的：像站在楼顶边缘，有人把手放在你背上，掌心温热，随时可以推。<\/p>\n          <p>我知道那是什么。我的身体知道。我身上所有那些在食堂里学会的东西都在尖叫：跑。<\/p>\n          <p>我不知道 SCP-579 是什么。<\/p>\n          <p>但我知道它在看着我。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十七章 走廊", "html": "<p>楼里面比外面更冷。走廊的灯还是亮的，有几盏在闪，闪的频率不规律，像有人在远处调它。<\/p>\n          <p>墙壁上有很深的抓痕，从天花板一直到腰的高度，三条一组，间距均匀。是刀刃留下的，不是爪子。<\/p>\n          <p>我走得很慢。每过一个转角，我都先看天花板的暗处，再走。<\/p>\n          <p>第四层的时候，我听见了。不是脚步声——它们走路没有声音。是金属划过混凝土的那种很轻的沙沙声，在我后面，隔着一个转角。<\/p>\n          <p>我停下，回头，盯着那个转角的边缘。<\/p>\n          <p>它出现了。士兵的形状，刀刃的手臂垂在两侧，眼窝是空的。它站在灯下，灯闪了一下，它的影子跟着晃。<\/p>\n          <p>我盯着它，它也“站”在那儿。我知道它正在算：那个看着它的人，在哪儿。<\/p>\n          <p>我一边盯着它，一边往后退。退到第八步，我的脚跟碰到了地上的一根电缆，身体歪了一下，视线偏了不到一秒钟。<\/p>\n          <p>一秒钟够了。<\/p>\n          <p>我的左小腿上多了一道口子，从膝盖下面一直划到脚踝。我甚至没看清它是怎么动的。我摔在地上，回头，它已经站在我原来位置的前面，刀刃上挂着血。<\/p>\n          <p>我盯着它，爬起来，继续往后退。<\/p>\n          <p>血在雪一样的地面上拖出一条线。我数着自己的步子。一百步，两百步，三百步。<\/p>\n          <p>它们没有追我。它们只是往同一个方向去——往下面去。<\/p>\n          <p>我比它们先到，只早了大概两分钟。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十八章 洞", "html": "<p>观察室在负九层。门是加固的，我从里面锁上。<\/p>\n          <p>房间不大，四面都是仪器，红灯绿灯，指针在很小的范围里抖。中间的地板上有一个洞。<\/p>\n          <p>洞是圆的，直径大约一米，边缘很整齐，像被什么东西从下面钻出来的。往下看，看不到底，只有一种很像水面的、微微晃动的东西。可那不是水。<\/p>\n          <p>外面的走廊里开始有声音。刀刃刮铁皮，一下，一下。很规律，像有人在耐心地敲门。<\/p>\n          <p>我抱着手提箱，走到洞边，蹲下，往里面看了一眼。<\/p>\n          <p>从我这个角度，从洞的斜度看下去，如果我在这里把箱子丢下去，它落的地方离 579 还差得很远。我看不见 579，但我知道它在下面，我也知道它在什么位置——那种知道不是看出来的，是被它放进脑子里的。<\/p>\n          <p>要把箱子送到它那里，只有一个办法：跳下去，在坠落的过程中把箱子扔出去。<\/p>\n          <p>这个高度，扔出箱子会是我这辈子做的最后一件事。<\/p>\n          <p>我坐在地上，把受伤的腿伸直。血在地板上洇开一小片。门还在响。<\/p>\n          <p>我忽然觉得很好笑。<\/p>\n          <p>我这一路走过来，一直在问为什么。为什么他们杀人，为什么他们发那些文件，为什么甘齐尔会破，为什么是我拿着这个箱子走遍半个世界。<\/p>\n          <p>我一个问题都没弄明白。<\/p>\n          <p>可我现在明白了另外一件事，一件我没问过的事：<span class=\"small\">为什么是我。<\/span><\/p>\n          <p>因为我不是聪明人。我不是能解开谜题的那种人。我从小到大，唯一一次当侦探，是查出一只猫，然后害死了它。<\/p>\n          <p>我是那种死在故事里的人。我不负责解释，我只负责让别人的故事能往下走。<\/p>\n          <p>这一路上所有人都比我懂：阿黛尔在食堂里看见我，没有报告；Epsilon-6 的那个指挥官知道自己该捅谁；罗斯知道自己说出来的那句话会让两个人尖叫；贝克知道自己不该记得。<\/p>\n          <p>只有我，什么都不知道。所以他们把箱子给了我。<\/p>\n          <p>因为一个什么都不知道的人，才走得完这条路。<\/p>"}, {"vol": "卷五 · 洞", "title": "第三十九章 跳", "html": "<p>门被撞了第三次。加固的门凹进来一块，边缘开始有裂缝。<\/p>\n          <p>我站起来，走到洞边。风从洞下面吹上来，是凉的，带着一种很干净的味道，像雪。<\/p>\n          <p>我抱着箱子，脚尖踩在洞沿上。<\/p>\n          <p>然后我想起了那三个月。<\/p>\n          <p>不是全部，只是几块：一条走廊，和这里一样的灯；一只手，戴着橡胶手套，在调整仪器；一个声音说“再看一次”；然后是一片白，白得像雪盲；然后是我自己站在加油站，手里拿着箱子，不知道自己在哪儿。<\/p>\n          <p>我想起来了。或者说，我想起我曾经想起来过。<\/p>\n          <p>我到过这里。我跳过。<\/p>\n          <p>我跳下去之后，箱子进了那个洞，然后有一次闪，很亮，很静，像有人在很远的地方关掉了一整个世界。然后我又在加油站醒过来——不是同一个我，是另一个我，一个没有记忆的我，手里还是拿着同一个箱子。<\/p>\n          <p>这就是为什么我的日志上有三个月的空白。不是被删了。是那三个月属于上一个我。<\/p>\n          <p>这就是为什么那本档案里的最后一条写着“生命体征消失”，而 Site-62C 的收容室里，会在一道光里出现一具和我基因完全相同的尸体。<\/p>\n          <p>我把时间走成了一个圈，而圈的另一头，是我的尸体。<\/p>\n          <p>我不明白为什么。这句话在心里响了最后一次。<\/p>\n          <p>我跳了。<\/p>\n          <p>坠落的那几秒很长，比我这十一个月加起来都长。风把我的耳朵灌满。我看见洞底的“水面”在放大，看见那上面有我的影子。<\/p>\n          <p>我把手臂伸直，把箱子往前推出去。<\/p>\n          <p>然后我看见了它。<\/p>\n          <p class=\"center\" style=\"margin-top:1.4em;font-size:19px;letter-spacing:.2em\">噢……原来是这样。<\/p>\n          <p class=\"center small\" style=\"margin-top:1em\">生命体征消失<\/p>"}, {"vol": "卷五 · 洞", "title": "第四十章 十二月四日", "html": "<p>2020 年 12 月 4 日，一道光出现在 Site-62C 内 SCP-579 的收容室里。<\/p>\n          <p>光灭之后，那里留下一具尸体，和一套损坏的机械护具。护具的内部结构图上写着它自己的名字：绝对斥外护具，SCP 基金会设计制造。<\/p>\n          <p>尸体的死因被判定为钝器伤，推测是高空坠落所致。<\/p>\n          <p>尸体的基因与基金会员工彼得罗·威尔逊完全一致。彼得罗·威尔逊当时在 062 号特外站点工作，职务是电网技术员。记忆删除治疗确认，他对 SCP-5000 一无所知，对档案里记录的那些事情毫无印象。<\/p>\n          <p>护具被送到 Site-22，编号 SCP-5000，等级 Safe，存放在标准储存单元里，处于未激活状态。<\/p>\n          <p>档案部的人把它里面的文件导出来，一共三十份记录。有人在导出的目录上标了一行小字：<\/p>\n          <p class=\"quote\">来源不明。作者自称彼得罗·威尔逊。<\/p>\n          <p>那天下午，彼得罗·威尔逊本人被叫到档案部做例行确认。他站在那张桌子前面，穿着一件洗得发白的工装，胸口挂着牌子，牌子上的照片比现在胖一点。<\/p>\n          <p>档案员问他：“你认识这个东西吗？”<\/p>\n          <p>他看了一眼那套护具，说：“我给它接过三次线。”<\/p>\n          <p>“那这些文件呢？”<\/p>\n          <p>“什么文件？”<\/p>\n          <p>档案员把目录推过去。他低头看了很久。他的表情一直是那种很普通的困惑，像一个被叫去解释一张不属于自己的账单的人。<\/p>\n          <p>“不是我写的。”他说，“字不像我的。”<\/p>\n          <p>“里面有你的名字。”<\/p>\n          <p>“那不是我。”<\/p>\n          <p>他把目录推回来，问：“还有别的事吗？我下午还要去 G 区。”<\/p>\n          <p>档案员说没有了。他点点头，走出去。<\/p>\n          <p>走到门口的时候，他停下来，回头问了一句：<\/p>\n          <p>“里面有人写过东西吗？”<\/p>\n          <p>“有。”档案员说，“很多。”<\/p>\n          <p>他“哦”了一声，就走了。<\/p>"}, {"vol": "卷五 · 洞", "title": "第四十一章 碎片", "html": "<p>档案的最后一页不是彼得的日志，是十三段被剪碎的对话。来源不明，说话人编号不明，录音设备不明。它们被按时间顺序排在一起，中间用空行隔开，没有一句是完整的。<\/p>\n          <p>我怀疑这些碎片是从某间会议室里流出来的——一间没有窗、只有七把椅子的会议室。但我没有证据。<\/p>\n          <p class=\"block\">“你说的是入侵，对吧？这可能是最后一次有人这么说了。”<br><br>“对。”<br><br>“别那么说。对你来说一定更糟。所有人知道了一件自己不喜欢的事之后，都是这么说的。”<br><br>“这不是几个小时能谈完的事，伙计。你能不能安静一分钟？当然你不能。还不到时候。那种被入侵的感觉。”<br><br>“为什么不？”<br><br>“别那么说！”<br><br>“连提都别提。”<br><br>“我们本来就不该去碰的。”<br><br>“我一直在想，一了百了会不会更好。可我们找到的不是那种东西。他们还要多久？可事情不是那样。我所是的一切。你知道他们会怎么说。”<br><br>“就是我。”<br><br>“结束了。”<br><br>“会花时间的。”<br><br>“你有洁癖，对吧？”<br><br>“收到回复了吗？我们本不该看的。你也是。我怀疑以后没人会再谈别的事了。”<br><br>“我觉得恶心。”<\/p>\n          <p>这十三段里，没有一段说出那件事是什么。这一点很重要——它们和前面罗斯说的那句、和那两位的尖叫、和那批下发的文件，说的是同一件事。这件事一旦被说出来，说话的人就不再能好好地说下一句。<\/p>\n          <p>所以档案里留着它，却没有写它。所以彼得罗跳下去的时候，只说了六个字。<\/p>\n          <p>所以这本书，写到最后也只能写到这里。<\/p>"}, {"vol": "卷五 · 洞", "title": "第四十二章 金属味", "html": "<p>我最后一次见到彼得罗·威尔逊，是在 062 号特外站点的食堂。<\/p>\n          <p>那天中午人很多。他端着餐盘，坐在靠门第三张桌子，正在吃一份通心粉。打饭的阿姨问他胡萝卜要不要，他说不要。<\/p>\n          <p>他吃得很慢。吃到一半，他停下来，抬头看了看食堂的门。<\/p>\n          <p>那扇门是普通的铁门，门框上有一块旧的补漆。他看了大概三秒，然后低头继续吃。<\/p>\n          <p>我不知道他在看什么。也许什么都没看。也许他只是觉得那道门有点眼熟。<\/p>\n          <p>我坐在他对面两桌远的地方，看着他吃完，把餐盘送回回收架，走出去。<\/p>\n          <p>他经过我旁边的时候，我闻到了一点味道。<\/p>\n          <p>不是血。是那种很干净、很像硬币的金属味。<\/p>\n          <p>只有一瞬间，然后就没有了。<\/p>\n          <hr class=\"dot\">\n          <p>全书完。<\/p>\n          <p class=\"small\" style=\"text-indent:0\">附：本书所依据的原始档案为 SCP-5000《为什么》，其全部内容均为虚构。文中涉及的组织、事件、人物都不存在。<\/p>"}];
+  var stage = document.getElementById("novStage");
+  var prog = document.getElementById("novProg");
+  var volEl = document.getElementById("novVol");
+  var bar = document.getElementById("novBar");
+  var btnPrev = document.getElementById("novPrev");
+  var btnNext = document.getElementById("novNext");
+  var toc = document.getElementById("novToc");
+  var tocList = document.getElementById("novTocList");
+  var TITLE = document.title;
+  var DUR = 300;
+  var cur = -1;
+  var anim = false;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function buildPage(i) {
+    var page = document.createElement("div");
+    page.className = "nov-page";
+    var h = document.createElement("h3");
+    h.className = "nov-ch-title";
+    h.textContent = CH[i].title;
+    page.appendChild(h);
+    var body = document.createElement("div");
+    body.className = "nov-ch-body";
+    body.innerHTML = CH[i].html;
+    page.appendChild(body);
+    return page;
+  }
+
+  function paintMeta(i) {
+    prog.textContent = (i + 1) + " / " + CH.length;
+    volEl.textContent = CH[i].vol || "";
+    bar.style.width = (((i + 1) / CH.length) * 100).toFixed(2) + "%";
+    btnPrev.disabled = i <= 0;
+    btnNext.disabled = i >= CH.length - 1;
+    document.title = CH[i].title + " · 世界尽头的游客";
+    var items = tocList.querySelectorAll(".nov-toc-item");
+    for (var k = 0; k < items.length; k++) {
+      items[k].classList.toggle("on", Number(items[k].getAttribute("data-i")) === i);
+    }
+  }
+
+  function show(i) {
+    var page = buildPage(i);
+    page.classList.add("current");
+    stage.innerHTML = "";
+    stage.appendChild(page);
+    cur = i;
+    paintMeta(i);
+  }
+
+  function turn(delta) {
+    if (anim) return;
+    var ni = cur + delta;
+    if (ni < 0 || ni >= CH.length) return;
+    var old = stage.querySelector(".nov-page.current");
+    if (reduce || !old) { show(ni); return; }
+    anim = true;
+    var np = buildPage(ni);
+    np.style.transition = "none";
+    np.style.transform = "translate3d(" + (delta > 0 ? "100%" : "-100%") + ",0,0)";
+    stage.appendChild(np);
+    void np.offsetWidth;
+    np.style.transition = "";
+    requestAnimationFrame(function () {
+      old.style.transform = "translate3d(" + (delta > 0 ? "-100%" : "100%") + ",0,0)";
+      np.style.transform = "translate3d(0,0,0)";
+    });
+    setTimeout(function () {
+      if (old.parentNode) old.parentNode.removeChild(old);
+      np.classList.add("current");
+      np.style.transform = "";
+      np.scrollTop = 0;
+      cur = ni;
+      paintMeta(ni);
+      anim = false;
+    }, DUR + 30);
+  }
+
+  function closeToc() { toc.classList.remove("on"); }
+
+  (function buildToc() {
+    var lastVol = null;
+    for (var i = 0; i < CH.length; i++) {
+      if (CH[i].vol !== lastVol && CH[i].vol) {
+        var g = document.createElement("div");
+        g.className = "nov-toc-vol";
+        g.textContent = CH[i].vol;
+        tocList.appendChild(g);
+        lastVol = CH[i].vol;
+      }
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "nov-toc-item";
+      b.setAttribute("data-i", String(i));
+      b.textContent = CH[i].title;
+      b.addEventListener("click", function () {
+        var idx = Number(this.getAttribute("data-i"));
+        closeToc();
+        if (idx !== cur) show(idx);
+      });
+      tocList.appendChild(b);
+    }
+  })();
+
+  btnPrev.addEventListener("click", function () { turn(-1); });
+  btnNext.addEventListener("click", function () { turn(1); });
+  document.getElementById("novTocBtn").addEventListener("click", function () {
+    toc.classList.add("on");
+    var on = tocList.querySelector(".nov-toc-item.on");
+    if (on) on.scrollIntoView({ block: "center" });
+  });
+  document.getElementById("novTocClose").addEventListener("click", closeToc);
+  toc.addEventListener("click", function (e) { if (e.target === toc) closeToc(); });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { e.preventDefault(); turn(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); turn(-1); }
+    else if (e.key === "Escape") closeToc();
+  });
+
+  var sx = 0, sy = 0, st = 0;
+  stage.addEventListener("touchstart", function (e) {
+    var t = e.touches[0];
+    sx = t.clientX; sy = t.clientY; st = Date.now();
+  }, { passive: true });
+  stage.addEventListener("touchend", function (e) {
+    var t = e.changedTouches[0];
+    var dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Date.now() - st < 700 && Math.abs(dx) > 56 && Math.abs(dx) > Math.abs(dy) * 1.35) {
+      turn(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+
+  show(0);
+})();
+</script>
+</body>
+</html>

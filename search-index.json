@@ -5,6 +5,16 @@
     "kw": "主页 首页 个人主页 站主 UP B站 首页"
   },
   {
+    "path": "/novels.html",
+    "title": "AI小说",
+    "kw": "AI小说 小说 书架 阅读 长篇"
+  },
+  {
+    "path": "/novel-1.html",
+    "title": "世界尽头的游客",
+    "kw": "世界尽头的游客 小说 AI小说 阅读"
+  },
+  {
     "path": "/download",
     "title": "下载中心",
     "kw": "下载 下载中心 文件 资源 美化包 其他"
